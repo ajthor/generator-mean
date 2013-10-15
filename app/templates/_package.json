@@ -1,0 +1,28 @@
+{
+	"name": "<%= _.slugify(project) %>",
+	"version": "0.0.0",
+    "private": false,
+    "engines": {
+        "node": "0.10.x",
+        "npm": "1.2.x"
+    },
+	"dependencies": {
+		"express": "latest",
+		"mongoose": "latest",
+		"connect-mongo": "latest",
+		"connect-flash": "latest",
+		"forever": "latest",
+		"bower": "latest",
+		"grunt": "latest",
+		"grunt-cli": "latest"
+	},
+	"devDependencies": {
+		"supertest": "latest",
+		"should": "latest",
+		"grunt-contrib-watch": "latest",
+		"grunt-contrib-jshint": "latest",
+		"grunt-nodemon": "latest",
+		"grunt-concurrent": "latest",
+		"grunt-mocha-test": "latest"
+	}
+}
