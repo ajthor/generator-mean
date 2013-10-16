@@ -5,12 +5,16 @@ var yeoman = require('yeoman-generator');
 
 var _ = require('underscore');
 
+var JSON = require('json3');
+
 
 var MeanGenerator = module.exports = function MeanGenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
 
-  this.hookFor('mean:angular-common', {args: args});
   this.hookFor('mean:angular-main', {args: args});
+  this.hookFor('mean:angular-module', {args: args});
+  this.hookFor('mean:build', {args: args});
+  this.hookFor('mean:express', {args: args});
 
   this.on('end', function () {
     this.installDependencies({ skipInstall: options['skip-install'] });
@@ -21,8 +25,8 @@ var MeanGenerator = module.exports = function MeanGenerator(args, options, confi
 
 util.inherits(MeanGenerator, yeoman.generators.Base);
 
-MeanGenerator.prototype.askFor = function askFor() {
-  var cb = this.async();
+MeanGenerator.prototype.ask = function ask() {
+  var done = this.async();
 
   // have Yeoman greet the user.
   console.log(this.yeoman);
@@ -39,22 +43,18 @@ MeanGenerator.prototype.askFor = function askFor() {
     name: 'features',
     message: 'Generator comes with MEAN stack built-in. What else would you lilke?',
     choices: [{
-      name: 'something',
-      value: 'something',
+      name: 'RequireJS Support',
+      value: 'requirejs',
       checked: true
     }]
   }];
 
   this.prompt(prompts, function (props) {
-    var i, features = props.features;
-    function hasFeature(feature) { return features.indexOf(feature) !== -1; }
-
     // extend this with props
-    console.log(props);
     _.extend(this, props);
-    
+    this.write('config/config.json', JSON.stringify(props));
 
-    cb();
+    done();
   }.bind(this));
 };
 
@@ -63,7 +63,7 @@ MeanGenerator.prototype.packageFiles = function packageFiles() {
   this.template('_bower.json', 'bower.json');
 };
 
-MeanGenerator.prototype.projectfiles = function projectfiles() {
+MeanGenerator.prototype.projectFiles = function projectFiles() {
   this.copy('editorconfig', '.editorconfig');
   this.copy('jshintrc', '.jshintrc');
 };

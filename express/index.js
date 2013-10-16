@@ -2,16 +2,35 @@
 var util = require('util');
 var yeoman = require('yeoman-generator');
 
-var ExpressGenerator = module.exports = function ExpressGenerator(args, options, config) {
-  // By calling `NamedBase` here, we get the argument to the subgenerator call
-  // as `this.name`.
-  yeoman.generators.NamedBase.apply(this, arguments);
+var _ = require('underscore');
 
-  console.log('You called the express subgenerator with the argument ' + this.name + '.');
+var ExpressGenerator = module.exports = function ExpressGenerator(args, options, config) {
+  yeoman.generators.Base.apply(this, arguments);
+
 };
 
-util.inherits(ExpressGenerator, yeoman.generators.NamedBase);
+util.inherits(ExpressGenerator, yeoman.generators.Base);
 
 ExpressGenerator.prototype.files = function files() {
-  this.copy('app.js', 'app.js');
+  var done = this.async();
+
+  var prompts = [{
+    name: 'PORT',
+    message: 'Please choose a {port} to run on: ',
+    default: '3000'
+  }];
+
+  this.prompt(prompts, function (props) {
+    var i, features = props.features;
+    function hasFeature(feature) { return features.indexOf(feature) !== -1; }
+
+    // extend this with props
+    console.log(props);
+    _.extend(this, props);
+    
+    done();
+  }.bind(this));
+
+  this.template('app.js', 'app.js');
+
 };
