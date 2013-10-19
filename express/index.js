@@ -25,7 +25,6 @@ ExpressGenerator.prototype.files = function files() {
     function hasFeature(feature) { return features.indexOf(feature) !== -1; }
 
     // extend this with props
-    console.log(props);
     _.extend(this, props);
     
     done();

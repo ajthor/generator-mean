@@ -1,13 +1,22 @@
 {
 	"name": "<%= _.slugify(project) %>",
 	"version": "0.0.0",
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "public/js/vendor",
+        "test",
+        "tests"
+    ],
 	"dependencies": {
+        "jquery": "latest",
         "angular": "~1.0.6",
         "angular-resource": "~1.0.6",
         "angular-cookies": "~1.0.6",
-        "angular-bootstrap": "~0.4.0",
-        "angular-ui-utils": "0.0.4",
-        "jquery": "~1.9.1"
+        "angular-bootstrap": "*",
+        "angular-ui-utils": "0.0.4"
     }
 }
 

@@ -40,8 +40,9 @@ AngularModuleGenerator.prototype.ask = function ask() {
 
 	this.prompt(prompts, function (props) {
 		// extend this with props
+
 		props.dependencies = _.compact(props.dependencies.split(" "));
-		this.modules[props.name] = _.pick(props, 'name', 'type', 'dependencies');
+		this.modules[props.name] = _.pick(props, 'type', 'name', 'dependencies');
 
 		done();
 	}.bind(this));
@@ -55,7 +56,9 @@ AngularModuleGenerator.prototype.deps = function deps() {
 	var keys = _.keys(this.modules);
 	deps = _.difference(deps, keys);
 
-	var msg = function() {return "Do you want to create modules for the dependencies: " + deps;}
+	var msg = function() {
+		return "Do you want to create modules for the dependencies:\n" + deps;
+	};
 	var prompts = [{
 		when: function (response) {
 			return deps.length;

@@ -16,15 +16,17 @@ AngularMainGenerator.prototype.files = function files() {
 	console.log("Initializing build of AngularJS-Main generator.");
 	// Do stuff.
 
-	console.log("Creating main module.");
+	console.log("Creating app module.");
 
 	this.modules = {};
 
 	this.modules.main = {
-		name: 'main',
+		name: 'app',
 		type: 'controller',
 		dependencies: []
 	};
 
 	this.write('config/modules.json', JSON.stringify(this.modules));
+	// if (this.config.modules.requirejs) 
+		this.copy('main.js', 'public/js/main.js');
 };

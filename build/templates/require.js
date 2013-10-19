@@ -3,4 +3,6 @@ define(function(require) {
 	var <%= dependencies[i] %> = require('<%= dependencies[i] %>');<% } %>
 
 	<%= module %>
+
+	return <%= name %>;
 });

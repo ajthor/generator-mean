@@ -2,22 +2,23 @@
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
-
 var _ = require('underscore');
-
 var JSON = require('json3');
 
+//
+// Begin generator
+//
 
 var MeanGenerator = module.exports = function MeanGenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
 
   this.hookFor('mean:angular-main', {args: args});
-  this.hookFor('mean:angular-module', {args: args});
   this.hookFor('mean:build', {args: args});
   this.hookFor('mean:express', {args: args});
 
   this.on('end', function () {
-    this.installDependencies({ skipInstall: options['skip-install'] });
+    this.bowerInstall(this.bowerModules, {save: true});
+    // this.installDependencies({skipInstall: options['skip-install']});
   });
 
   this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
@@ -26,6 +27,7 @@ var MeanGenerator = module.exports = function MeanGenerator(args, options, confi
 util.inherits(MeanGenerator, yeoman.generators.Base);
 
 MeanGenerator.prototype.ask = function ask() {
+
   var done = this.async();
 
   // have Yeoman greet the user.
@@ -40,11 +42,15 @@ MeanGenerator.prototype.ask = function ask() {
     message: 'Give a quick description: '
   }, {
     type: 'checkbox',
-    name: 'features',
+    name: 'bowerModules',
     message: 'Generator comes with MEAN stack built-in. What else would you lilke?',
     choices: [{
       name: 'RequireJS Support',
       value: 'requirejs',
+      checked: true
+    }, {
+      name: 'RequireJS Text Add-on',
+      value: 'requirejs-text',
       checked: true
     }]
   }];
@@ -60,7 +66,6 @@ MeanGenerator.prototype.ask = function ask() {
 
 MeanGenerator.prototype.packageFiles = function packageFiles() {
   this.template('_package.json', 'package.json');
-  this.template('_bower.json', 'bower.json');
 };
 
 MeanGenerator.prototype.projectFiles = function projectFiles() {
@@ -79,4 +84,16 @@ MeanGenerator.prototype.directoryStructure = function directoryStructure() {
   this.mkdir('public/views');
   this.mkdir('public/partials');
   this.mkdir('test');
+};
+
+MeanGenerator.prototype.bowerConfig = function bowerConfig() {
+  this.bowerModules = _.union([
+    'jquery',
+    'angular',
+    'angular-bootstrap'
+  ], this.bowerModules);
+
+  for (var i in this.bowerModules) this.bowerModules[i]+='#latest';
+
+  this.template('_bower.json', 'bower.json');
 };

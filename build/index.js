@@ -28,16 +28,12 @@ BuildGenerator.prototype.controllers = function controllers() {
 	_.each(modules, function (module) {
 		var controller = _.template(this.readFileAsString(path.join(this.sourceRoot(), 'controller.js')), module);
 
-		module.module = controller;
-		this.template('require.js', 'public/js/controllers/' + module.name + '.js', module);
+		// if (this.config.bowerModules.requirejs) {
+			module.module = controller;
+			this.template('require.js', 'public/js/controllers/' + module.name + '.js', module);
+		// } else {
+			// this.write('public/js/controllers/' + module.name + '.js', controller);
+		// }
 	}.bind(this));
 };
-
-// BuildGenerator.prototype.create = function create() {
-// 	var obj = {};
-// 	obj.dependencies = ['something'];
-// 	obj.module = this.readFileAsString(path.join(this.sourceRoot(), 'controller.js'));
-// 	_.template(obj.module, )
-// 	this.template('require.js', 'test.js', obj);
-// };
 
