@@ -1,16 +1,13 @@
 'use strict';
 var util = require('util');
-var path = require('path');
-var yeoman = require('yeoman-generator');
-
-var JSON = require('json3');
+var SubGenerator = require('../subgenerator-lib.js');
 
 var AngularMainGenerator = module.exports = function AngularMainGenerator(args, options, config) {
-  yeoman.generators.Base.apply(this, arguments);
-
+  SubGenerator.apply(this, arguments);
+  
 };
 
-util.inherits(AngularMainGenerator, yeoman.generators.Base);
+util.inherits(AngularMainGenerator, SubGenerator);
 
 AngularMainGenerator.prototype.files = function files() {
 	console.log("Initializing build of AngularJS-Main generator.");
@@ -19,28 +16,28 @@ AngularMainGenerator.prototype.files = function files() {
 	console.log("Creating app module.");
 	var done = this.async();
 	this.modules = {};
+	this.modules.app = {
+		name: 'app',
+		type: 'module',
+		dependencies: ['ngRoute'],
+		hasRoute: true,
+		route: "/index.html"
+	};
 
 	var prompts = [{
-		name: 'name',
+		name: 'appName',
 		message: "What is the app name?\n(Use an abbreviation, will be prefixed on modules)",
 		default: 'app'
 	}];
 
 	this.prompt(prompts, function (props) {
 		// extend this with props
-		this.modules.app = {
-			name: 'app',
-			type: 'controller',
-			dependencies: [],
-			hasRoute: true,
-			route: "/index.html"
-		};
-		this.modules.app.name = props.name || "app";
-
+		_.extend(this.options, props);
 		done();
-	}.bind(this));	
+	}.bind(this));
 
-	this.write('config/modules.json', JSON.stringify(this.modules));
-	// if (this.config.modules.requirejs) 
+
+	// this.saveConfigFile('modules');
+	if (this.options.bowerModules.requirejs) 
 		this.copy('main.js', 'public/js/main.js');
 };

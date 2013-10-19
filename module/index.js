@@ -1,28 +1,23 @@
 'use strict';
 var util = require('util');
-var path = require('path');
-var yeoman = require('yeoman-generator');
-
+var SubGenerator = require('../subgenerator-lib.js');
 var _ = require('underscore');
-
-var JSON = require('json3');
 var prettyjson = require('prettyjson');
 
-var AngularModuleGenerator = module.exports = function AngularModuleGenerator(args, options, config) {
-  yeoman.generators.Base.apply(this, arguments);
-
-  this.hookFor('mean:build', {args: args});
+var ModuleGenerator = module.exports = function ModuleGenerator(args, options, config) {
+  SubGenerator.apply(this, arguments);
+  
 };
 
-util.inherits(AngularModuleGenerator, yeoman.generators.Base);
+util.inherits(ModuleGenerator, SubGenerator);
 
-AngularModuleGenerator.prototype.ask = function ask() {
+ModuleGenerator.prototype.ask = function ask() {
 
 	var done = this.async();
+	this.modules || (this.modules = {});
 
 	console.log("\n\nInitializing build of AngularJS-Modules generator.");
 	// Do stuff.
-	this.modules = JSON.parse(this.readFileAsString(path.join(this.destinationRoot(), 'config/modules.json')));
 
 	var prompts = [{
 		type: 'list',
@@ -38,9 +33,11 @@ AngularModuleGenerator.prototype.ask = function ask() {
 		name: 'dependencies',
 		message: "What are the dependencies of this module? \n(Separate multiple dependencies with spaces)"
 	}, {
+		when: function (r) {return r.type == 'controller';},
 		type: 'confirm',
 		name: 'hasRoute',
-		message: "Does the controller have a route?"
+		message: "Does the controller have a route?",
+		default: false
 	}, {
 		when: function (r) {return r.hasRoute;},
 		type: 'input',
@@ -61,7 +58,7 @@ AngularModuleGenerator.prototype.ask = function ask() {
 
 };
 
-AngularModuleGenerator.prototype.deps = function deps() {
+ModuleGenerator.prototype.deps = function deps() {
 
 	var done  = this.async();
 	var deps = _.flatten(_.pluck(this.modules, 'dependencies'));
@@ -88,7 +85,9 @@ AngularModuleGenerator.prototype.deps = function deps() {
 				this.modules[dep] = {
 					name: dep,
 					type: 'controller',
-					dependencies: []
+					dependencies: [],
+					hasRoute: false,
+					route: ""
 				};
 
 			}, this);
@@ -97,31 +96,22 @@ AngularModuleGenerator.prototype.deps = function deps() {
 	}.bind(this));
 };
 
-// AngularModuleGenerator.prototype.another = function another() {
-// 	var done = this.async();
-// 	var another = true;
-// 	var prompts = [{
-// 		type: 'confirm',
-// 		name: 'another',
-// 		message: 'Would you like to create another module?',
-// 		default: false
-// 	}];
+ModuleGenerator.prototype.setOtherOptions = function setOtherOptions() {
 
-// 	for(var i = 0;another;i++) {
-// 		this._ask();
-// 		this.prompt(prompts, function (props) {
-// 			another = props.another;
-// 			done();
-// 		}.bind(this));
+	_.each(this.modules, function (module) {
+		
+		module.appName = this.config.get.appName;
+		module.directory = module.name.substring(0, module.name.lastIndexOf('/')+1);
+		module.name = module.name.substring(module.name.lastIndexOf('/')+1);
+		
+	}, this);
 
-// 		if(i==5) another = false; 
-// 	}
-// };
+};
 
-AngularModuleGenerator.prototype.confirm = function confirm() {
+ModuleGenerator.prototype.confirm = function confirm() {
 	var done = this.async();
 	var msg = function() {
-		return "module.json\n\n" + prettyjson.render(this.modules) + "\n\nDoes this look good?";
+		return "Modules:\n\n" + prettyjson.render(this.modules) + "\n\nDoes this look good?";
 	}.bind(this);
 
 	var prompts = [{
@@ -132,7 +122,8 @@ AngularModuleGenerator.prototype.confirm = function confirm() {
 	}];
 
 	this.prompt(prompts, function (props) {
-		if(props.looksGood) this.write('config/modules.json', JSON.stringify(this.modules));
+		if(props.looksGood) this.config.set('modules', this.modules);
+		// this.write('config/modules.json', JSON.stringify(this.modules));
 		done();
 	}.bind(this));
 

@@ -12,36 +12,31 @@ var JSON = require('json3');
 var MeanGenerator = module.exports = function MeanGenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
 
-  this.hookFor('mean:angular-main', {args: args});
-  this.hookFor('mean:build', {args: args});
-  this.hookFor('mean:express', {args: args});
-
-  this.on('end', function () {
-    this.installDependencies({skipInstall: options['skip-install']});
+  this.hookFor('mean:common', {
+    args: args
   });
 
-  this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
+  this.hookFor('mean:build', {
+    args: args
+  });
+
+  this.on('end', function () {
+    // this.installDependencies({skipInstall: options['skip-install']});
+  });
+
 };
 
 util.inherits(MeanGenerator, yeoman.generators.Base);
 
-MeanGenerator.prototype.ask = function ask() {
+MeanGenerator.prototype.setConfiguration = function setConfiguration() {
 
   var done = this.async();
-
   // have Yeoman greet the user.
   console.log(this.yeoman);
 
   var prompts = [{
-    name: 'project',
-    message: 'What is the name of the project?',
-    default: 'test'
-  }, {
-    name: 'description',
-    message: 'Give a quick description: '
-  }, {
     type: 'checkbox',
-    name: 'bowerModules',
+    name: 'modules',
     message: 'Generator comes with MEAN stack built-in. What else would you lilke?',
     choices: [{
       name: 'RequireJS Support (experimental)',
@@ -59,41 +54,9 @@ MeanGenerator.prototype.ask = function ask() {
   }];
 
   this.prompt(prompts, function (props) {
-    // extend this with props
-    _.extend(this, props);
-    this.write('config/config.json', JSON.stringify(props));
+
+    this.config.set("bowerModules", props.modules);
 
     done();
   }.bind(this));
-};
-
-MeanGenerator.prototype.packageFiles = function packageFiles() {
-  this.template('_package.json', 'package.json');
-};
-
-MeanGenerator.prototype.projectFiles = function projectFiles() {
-  this.copy('editorconfig', '.editorconfig');
-  this.copy('jshintrc', '.jshintrc');
-};
-
-MeanGenerator.prototype.directoryStructure = function directoryStructure() {
-  this.mkdir('app');
-  this.mkdir('app/views');
-  this.mkdir('config');
-  this.mkdir('public/css');
-  this.mkdir('public/img');
-  this.mkdir('public/js');
-  this.mkdir('public/js/vendor');
-  this.mkdir('public/views');
-  this.mkdir('public/partials');
-  this.mkdir('test');
-};
-
-MeanGenerator.prototype.bowerConfig = function bowerConfig() {
-  this.bowerModules = _.union([
-    'jquery',
-    'angular'
-  ], this.bowerModules);
-
-  this.template('_bower.json', 'bower.json');
 };

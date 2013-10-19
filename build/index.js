@@ -1,43 +1,37 @@
 'use strict';
 var util = require('util');
 var path = require('path');
-var yeoman = require('yeoman-generator');
-
+var SubGenerator = require('../subgenerator-lib.js');
 var _ = require('underscore');
-
-var JSON = require('json3');
 var prettyjson = require('prettyjson');
 
 var BuildGenerator = module.exports = function BuildGenerator(args, options, config) {
-  yeoman.generators.Base.apply(this, arguments);
-
+  SubGenerator.apply(this, arguments);
+  
 };
 
-util.inherits(BuildGenerator, yeoman.generators.Base);
+util.inherits(BuildGenerator, SubGenerator);
 
 BuildGenerator.prototype.build = function build() {
 	console.log("\n\nInitializing build...");
 	// Do stuff.
-	this.modules = JSON.parse(this.readFileAsString(path.join(this.destinationRoot(), 'config/modules.json')));
 
 };
 
-BuildGenerator.prototype.controllers = function controllers() {
+BuildGenerator.prototype.files = function files(type) {
 	// Do stuff.
-	var    modules = _.where(this.modules, {type: 'controller'});
+	console.log(this.config);
+	var modules = this.config.get('modules');
+	var bowerModules = this.config.get("bowerModules");
+	//        modules = _.where(modules, {type: type});
 	_.each(modules, function (module) {
-		// Get module name and separate from directory.
-		module.directory = module.name.substring(0, module.name.lastIndexOf('/')+1);
-		module.name = module.name.substring(module.name.lastIndexOf('/')+1);
-
-		var controller = _.template(this.readFileAsString(path.join(this.sourceRoot(), 'controller.js')), module);
+		var output = _.template(this.readFileAsString(path.join(this.sourceRoot(), module.type+'.js')), module);
 		
-		// if (this.config.bowerModules.requirejs) {
-			module.module = controller;
-			this.template('require.js', 'public/js/controllers/' + module.directory + module.name + '.js', module);
-		// } else {
-			// this.write('public/js/controllers/' + module.name + '.js', controller);
-		// }
+		if (bowerModules.requirejs) {
+			module.module = output;
+			// this.template('require.js', 'public/js/controllers/' + module.directory + module.name + '.js', module);
+			output = _.template(this.readFileAsString(path.join(this.sourceRoot(), 'require.js')), module);
+		}
+		this.write(path.join('public/js/', module.type, module.directory, module.name + '.js'), output);
 	}.bind(this));
 };
-

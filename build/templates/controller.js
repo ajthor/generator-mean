@@ -5,7 +5,6 @@ var <%= name %> = angular.module('controllers')
 
 
 	}]);
-
 	<% if (hasRoute) { %>
 	<%= name %>.config(function ($routeProvider) {
 		//define module-specific route here

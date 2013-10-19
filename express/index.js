@@ -1,15 +1,13 @@
 'use strict';
 var util = require('util');
-var yeoman = require('yeoman-generator');
-
-var _ = require('underscore');
+var SubGenerator = require('../subgenerator-lib.js');
 
 var ExpressGenerator = module.exports = function ExpressGenerator(args, options, config) {
-  yeoman.generators.Base.apply(this, arguments);
-
+  SubGenerator.apply(this, arguments);
+  
 };
 
-util.inherits(ExpressGenerator, yeoman.generators.Base);
+util.inherits(ExpressGenerator, SubGenerator);
 
 ExpressGenerator.prototype.files = function files() {
   var done = this.async();
