@@ -21,9 +21,6 @@ ExpressGenerator.prototype.files = function files() {
   }];
 
   this.prompt(prompts, function (props) {
-    var i, features = props.features;
-    function hasFeature(feature) { return features.indexOf(feature) !== -1; }
-
     // extend this with props
     _.extend(this, props);
     

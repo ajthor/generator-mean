@@ -17,8 +17,7 @@ var MeanGenerator = module.exports = function MeanGenerator(args, options, confi
   this.hookFor('mean:express', {args: args});
 
   this.on('end', function () {
-    this.bowerInstall(this.bowerModules, {save: true});
-    // this.installDependencies({skipInstall: options['skip-install']});
+    this.installDependencies({skipInstall: options['skip-install']});
   });
 
   this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
@@ -45,12 +44,16 @@ MeanGenerator.prototype.ask = function ask() {
     name: 'bowerModules',
     message: 'Generator comes with MEAN stack built-in. What else would you lilke?',
     choices: [{
-      name: 'RequireJS Support',
+      name: 'RequireJS Support (experimental)',
       value: 'requirejs',
       checked: true
     }, {
       name: 'RequireJS Text Add-on',
       value: 'requirejs-text',
+      checked: true
+    }, {
+      name: 'Twitter Bootstrap',
+      value: 'bootstrap',
       checked: true
     }]
   }];
@@ -89,11 +92,8 @@ MeanGenerator.prototype.directoryStructure = function directoryStructure() {
 MeanGenerator.prototype.bowerConfig = function bowerConfig() {
   this.bowerModules = _.union([
     'jquery',
-    'angular',
-    'angular-bootstrap'
+    'angular'
   ], this.bowerModules);
-
-  for (var i in this.bowerModules) this.bowerModules[i]+='#latest';
 
   this.template('_bower.json', 'bower.json');
 };

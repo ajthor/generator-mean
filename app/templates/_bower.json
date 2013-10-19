@@ -11,11 +11,11 @@
         "tests"
     ],
 	"dependencies": {
-        "jquery": "latest",
-        "angular": "~1.0.6",
+        <% bowerModules.forEach( function ( module ) { %>
+        "<%= module %>": "*",<% }); %>
         "angular-resource": "~1.0.6",
         "angular-cookies": "~1.0.6",
-        "angular-bootstrap": "*",
+        "angular-bootstrap": "~0.6.0",
         "angular-ui-utils": "0.0.4"
     }
 }

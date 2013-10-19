@@ -11,6 +11,7 @@ var prettyjson = require('prettyjson');
 var AngularModuleGenerator = module.exports = function AngularModuleGenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
 
+  this.hookFor('mean:build', {args: args});
 };
 
 util.inherits(AngularModuleGenerator, yeoman.generators.Base);
@@ -27,7 +28,7 @@ AngularModuleGenerator.prototype.ask = function ask() {
 		type: 'list',
 		name: 'type',
 		message: 'What type of module would you like to add?',
-		choices: ['controller', 'view', 'module']
+		choices: ['controller', 'module']
 	}, {
 		type: 'input',
 		name: 'name',
@@ -36,13 +37,24 @@ AngularModuleGenerator.prototype.ask = function ask() {
 		type: 'input',
 		name: 'dependencies',
 		message: "What are the dependencies of this module? \n(Separate multiple dependencies with spaces)"
+	}, {
+		type: 'confirm',
+		name: 'hasRoute',
+		message: "Does the controller have a route?"
+	}, {
+		when: function (r) {return r.hasRoute;},
+		type: 'input',
+		name: 'route',
+		message: "What is the name of the route?",
+		default: "index.html"
 	}];
 
 	this.prompt(prompts, function (props) {
 		// extend this with props
 
 		props.dependencies = _.compact(props.dependencies.split(" "));
-		this.modules[props.name] = _.pick(props, 'type', 'name', 'dependencies');
+
+		this.modules[props.name] = _.pick(props, 'type', 'name', 'dependencies', 'hasRoute', 'route');
 
 		done();
 	}.bind(this));

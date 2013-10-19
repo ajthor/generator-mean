@@ -26,11 +26,15 @@ BuildGenerator.prototype.controllers = function controllers() {
 	// Do stuff.
 	var    modules = _.where(this.modules, {type: 'controller'});
 	_.each(modules, function (module) {
-		var controller = _.template(this.readFileAsString(path.join(this.sourceRoot(), 'controller.js')), module);
+		// Get module name and separate from directory.
+		module.directory = module.name.substring(0, module.name.lastIndexOf('/')+1);
+		module.name = module.name.substring(module.name.lastIndexOf('/')+1);
 
+		var controller = _.template(this.readFileAsString(path.join(this.sourceRoot(), 'controller.js')), module);
+		
 		// if (this.config.bowerModules.requirejs) {
 			module.module = controller;
-			this.template('require.js', 'public/js/controllers/' + module.name + '.js', module);
+			this.template('require.js', 'public/js/controllers/' + module.directory + module.name + '.js', module);
 		// } else {
 			// this.write('public/js/controllers/' + module.name + '.js', controller);
 		// }

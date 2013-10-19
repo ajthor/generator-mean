@@ -1,6 +1,6 @@
 define(function(require) {
-	<% for(var i in dependencies) { %>
-	var <%= dependencies[i] %> = require('<%= dependencies[i] %>');<% } %>
+	<% dependencies.forEach( function ( dependency ) { %>
+    var <%= dependency %> = require('<%= dependency %>');<% }); %>
 
 	<%= module %>
 

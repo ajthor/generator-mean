@@ -17,14 +17,28 @@ AngularMainGenerator.prototype.files = function files() {
 	// Do stuff.
 
 	console.log("Creating app module.");
-
+	var done = this.async();
 	this.modules = {};
 
-	this.modules.main = {
-		name: 'app',
-		type: 'controller',
-		dependencies: []
-	};
+	var prompts = [{
+		name: 'name',
+		message: "What is the app name?\n(Use an abbreviation, will be prefixed on modules)",
+		default: 'app'
+	}];
+
+	this.prompt(prompts, function (props) {
+		// extend this with props
+		this.modules.app = {
+			name: 'app',
+			type: 'controller',
+			dependencies: [],
+			hasRoute: true,
+			route: "/index.html"
+		};
+		this.modules.app.name = props.name || "app";
+
+		done();
+	}.bind(this));	
 
 	this.write('config/modules.json', JSON.stringify(this.modules));
 	// if (this.config.modules.requirejs) 
