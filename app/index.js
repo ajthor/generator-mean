@@ -2,61 +2,66 @@
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
-var _ = require('underscore');
-var JSON = require('json3');
 
-//
-// Begin generator
-//
+var GeneratorBase = require('../generator-base.js');
 
-var MeanGenerator = module.exports = function MeanGenerator(args, options, config) {
-  yeoman.generators.Base.apply(this, arguments);
 
-  this.hookFor('mean:common', {
-    args: args
-  });
-
-  this.hookFor('mean:build', {
-    args: args
-  });
+var MeanGenerator = module.exports = function MeanGenerator() {
+  GeneratorBase.apply(this, arguments);
 
   this.on('end', function () {
-    // this.installDependencies({skipInstall: options['skip-install']});
+    // this.installDependencies({ skipInstall: options['skip-install'] });
   });
 
+  this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
 };
 
-util.inherits(MeanGenerator, yeoman.generators.Base);
+util.inherits(MeanGenerator, GeneratorBase);
 
-MeanGenerator.prototype.setConfiguration = function setConfiguration() {
-
-  var done = this.async();
+MeanGenerator.prototype.askFor = function askFor() {
   // have Yeoman greet the user.
   console.log(this.yeoman);
 
+  var done = this.async();
+
   var prompts = [{
     type: 'checkbox',
-    name: 'modules',
-    message: 'Generator comes with MEAN stack built-in. What else would you lilke?',
+    name: 'dependencies',
+    message: "What else would you like?",
     choices: [{
-      name: 'RequireJS Support (experimental)',
+      name: 'RequireJS Support',
       value: 'requirejs',
       checked: true
     }, {
-      name: 'RequireJS Text Add-on',
+      name: 'RequireJS Text Plugin',
       value: 'requirejs-text',
-      checked: true
-    }, {
-      name: 'Twitter Bootstrap',
-      value: 'bootstrap',
       checked: true
     }]
   }];
 
-  this.prompt(prompts, function (props) {
-
-    this.config.set("bowerModules", props.modules);
+  this.prompt(prompts, function (results) {
+    this.setConfig("dependencies", results.dependencies);
 
     done();
   }.bind(this));
+
+};
+
+MeanGenerator.prototype.directory = function directory() {
+  
+  var directory = this.directory = {
+    app:         "app",
+    appviews:    "app/views",
+    public:      "public",
+    images:      "public/img",
+    styles:      "public/css",
+    scripts:     "public/js",
+    vendor:      "public/js/vendor",
+    publicviews: "public/views",
+    test:        "test",
+    specs:       "test/specs"
+  };
+
+  this.setConfig("directory", directory);
+  
 };

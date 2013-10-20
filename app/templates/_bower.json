@@ -1,19 +1,6 @@
 {
-	"name": "<%= _.slugify(project) %>",
-	"version": "0.0.0",
-    "license": "MIT",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "public/js/vendor",
-        "test",
-        "tests"
-    ],
-	"dependencies": {
-        <% bowerModules.forEach( function ( module ) { %>
-        "<%= module %>": "*",<% }); %>
-        "angular-ui-utils": "0.0.4"
-    }
+  "name": "package",
+  "version": "0.0.0",
+  "dependencies": {}
 }
 

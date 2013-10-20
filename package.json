@@ -1,6 +1,6 @@
 {
   "name": "generator-mean",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "A generator for Yeoman",
   "keywords": [
     "yeoman-generator"
@@ -8,7 +8,8 @@
   "homepage": "https://github.com/ajthor/generator-mean",
   "bugs": "https://github.com/ajthor/generator-mean/issues",
   "author": {
-    "name": "Adam",
+    "name": "",
+    "email": "",
     "url": "https://github.com/ajthor"
   },
   "main": "app/index.js",
@@ -21,16 +22,14 @@
   },
   "dependencies": {
     "yeoman-generator": "~0.13.0",
-    "bower": "latest",
-    "underscore": "latest",
-    "json3": "~3.2.4",
-    "prettyjson": "latest"
+    "async": "~0.2.9",
+    "lodash": "~2.2.1"
   },
   "devDependencies": {
     "mocha": "~1.12.0"
   },
   "peerDependencies": {
-    "yo": ">=1.0.0"
+    "yo": ">=1.0.0-rc.1"
   },
   "engines": {
     "node": ">=0.8.0",
