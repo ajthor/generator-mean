@@ -42,15 +42,45 @@ MeanGenerator.prototype.askFor = function askFor() {
 
   this.prompt(prompts, function (results) {
     this.setConfig("dependencies", results.dependencies);
+    this.dependencies = results.dependencies;
 
     done();
   }.bind(this));
 
 };
 
+MeanGenerator.prototype.buildFiles = function buildFiles() {
+  this.template('_bower.json', 'bower.json');
+  this.template('_package.json', 'package.json');
+  this.template('Gruntfile.js', 'Gruntfile.js');
+};
+
+MeanGenerator.prototype.defaultModules = function defaultModules() {
+  this.createModule({
+    name: 'app',
+    type: 'module',
+    dependencies: [
+      'ngRoute',
+      'app.controllers',
+      'app.directives',
+      'app.services',
+      'app.filters'
+    ]
+  }, 'app.js');
+
+  this.createModule({
+    name: 'main',
+    type: 'module',
+    dependencies: [
+      'app'
+    ]
+  }, 'main.js');
+};
+
 MeanGenerator.prototype.directories = function directories() {
   
   var done = this.async();
+
   var directories = this.directories = {
     app:         "app",
     appviews:    "app/views",
@@ -70,16 +100,10 @@ MeanGenerator.prototype.directories = function directories() {
   this.setConfig("templateDirectory", templateDirectory);
 
   _.each(directories, function (dir) {
-    console.log("Creating directory: " + dir);
+    // console.log("Creating directory: " + dir);
     this.mkdir(dir);
     
     done();
   }, this);
   
-};
-
-MeanGenerator.prototype.buildFiles = function buildFiles() {
-  this.template('_bower.json', 'bower.json');
-  this.template('_package.json', 'package.json');
-  this.template('Gruntfile.js', 'Gruntfile.js');
 };

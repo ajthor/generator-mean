@@ -12,26 +12,39 @@ var Generator = module.exports = function Generator() {
 
 util.inherits(Generator, yeoman.generators.Base);
 
+Generator.prototype.getConfig = function getConfig(key) {
+	var result = this.config.get(key);
+
+	if (!result) {
+		if (arguments && arguments[1]===true) {
+			console.log(arguments); 
+			throw "Config value \'" + key + "\'' is not set. Try running the generator again.";
+		}
+		else { 
+			return void 0;
+		}
+	}
+
+	return result;
+};
+
 Generator.prototype.setConfig = function setConfig(key, value) {
-	var done = this.async();
 	// validation?
 	// console.log("Setting config value: " + key + ", " + value);
 	this.config.set(key, value);
-	done();
 };
 
-Generator.prototype.createModule = function createModule(module, dest) {
+Generator.prototype.createModule = function createModule(module, template, dest) {
 	if (!this.validateModule(module)) {
 		module = _.defaults(module, {
 			name: 'main',
 			type: '',
 			dependencies: []
-
 		});
 	}
 
 	this.saveModule(module);
-	this.buildModule(module, dest);
+	this.buildModule(module, template, dest);
 };
 
 Generator.prototype.validateModule = function validateModule(module) {
@@ -45,25 +58,26 @@ Generator.prototype.validateModule = function validateModule(module) {
 };
 
 Generator.prototype.saveModule = function saveModule(module) {
-	var modules = this.config.get('modules');
+	var modules = this.getConfig('modules', false);
 	modules || (modules = {});
 
 	modules[module.name] = module;
 	this.setConfig('modules', modules);
 };
 
-Generator.prototype.buildModule = function buildModule(module, dest) {
-	if(!module) throw "Must supply a module to be built.";
+Generator.prototype.buildModule = function buildModule(module, template, dest) {
+	this.validateModule(module);
 
 	var moduleType = module.type;
 
-	var dependencies = this.config.get('dependencies');
-	var directories = this.config.get('directories');
-	var templateDirectory = this.config.get('templateDirectory');
+	var dependencies = this.getConfig('dependencies');
+	var directories = this.getConfig('directories');
+	var templateDirectory = this.getConfig('templateDirectory');
 
-	var outputPath = path.join(directories.scripts, dest);
+	var outputPath = dest ? dest : path.join(directories.scripts, module.name+'.js');
 
-	var output = _.template(this.readFileAsString(path.join(templateDirectory, moduleType+'.js')), module);
+	template = this.readFileAsString(path.join(templateDirectory, (template ? template : moduleType+'.js')));
+	var output = _.template(template, module);
 
 	if (dependencies.indexOf('requirejs') !== -1) {
 		module.module = output;

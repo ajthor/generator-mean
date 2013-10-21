@@ -29,7 +29,7 @@ Generator.prototype.askFor = function askFor() {
 	}, {
 		type: 'input',
 		name: 'dependencies',
-		message: "Dependencies: "
+		message: "Dependencies (separate dependencies with a space): "
 	}, {
 		when: function (r) {return r.type==='controller'},
 		type: 'confirm',
@@ -46,7 +46,7 @@ Generator.prototype.askFor = function askFor() {
 	this.prompt(prompts, function (results) {
 		// results.name = _.camelize(results.name);
 		results.dependencies = _.compact(results.dependencies.split(" "));
-		this.createModule(results, 'test.js');
+		this.createModule(results);
 
 		done();
 	}.bind(this));
