@@ -37,10 +37,26 @@ MeanGenerator.prototype.askFor = function askFor() {
       name: 'RequireJS Text Plugin',
       value: 'requirejs-text',
       checked: true
+    }, {
+      name: 'Other',
+      value: 'other',
+      checked: false
     }]
+  }, {
+    when: function (r) {return r.dependencies.indexOf('other') !== -1;},
+    type: 'input',
+    name: 'other',
+    message: "Other dependencies (separate with a space): "
   }];
 
   this.prompt(prompts, function (results) {
+    results.dependencies = _.filter(results.dependencies, function (r) {return r !== 'other';});
+    if(results.dependencies.indexOf('other') !== -1) {
+      results.other = _.compact(results.other.split(" "));
+      results.dependencies = _.union(results.dependencies, results.other);
+    }
+
+    console.log(results.dependencies);
     this.setConfig("dependencies", results.dependencies);
     this.dependencies = results.dependencies;
 
@@ -70,7 +86,7 @@ MeanGenerator.prototype.defaultModules = function defaultModules() {
 
   this.createModule({
     name: 'main',
-    type: 'module',
+    type: 'controller',
     dependencies: [
       'app'
     ]

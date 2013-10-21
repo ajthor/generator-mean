@@ -29,13 +29,18 @@ Generator.prototype.askFor = function askFor() {
 	}, {
 		type: 'input',
 		name: 'dependencies',
-		message: "Dependencies (separate dependencies with a space): "
+		message: "Dependencies (separate with a space): "
 	}, {
 		when: function (r) {return r.type==='controller'},
 		type: 'confirm',
 		name: 'hasRoute',
 		message: "Does the module have a route?",
 		default: false
+	}, {
+		when: function (r) {return r.hasRoute;},
+		type: 'input',
+		name: 'when',
+		message: "When: "
 	}, {
 		when: function (r) {return r.hasRoute;},
 		type: 'input',

@@ -7,6 +7,9 @@
 
 		}])<% if (hasRoute) { %>
 		
-		.config(function ($routeProvider) {
-			//define module-specific route here
-		});<% } %>
+		.config(['$routeProvider', function ($routeProvider) {
+			$routeProvider.when('<%= when %>', {
+				templateUrl: '<%= route %>',
+				controller: '<%= name %>'
+			});
+		}]);<% } %>
