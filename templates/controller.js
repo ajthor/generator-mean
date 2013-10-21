@@ -6,7 +6,7 @@
 
 
     }]);
-    <% if (hasRoute) { %>
+    <% if (_.has(this, 'hasRoute') && hasRoute) { %>
     <%= name %>.config(function ($routeProvider) {
             //define module-specific route here
     });<% } %>

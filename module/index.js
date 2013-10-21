@@ -19,12 +19,12 @@ Generator.prototype.askFor = function askFor() {
 		type: 'list',
 		name: 'type',
 		message: "What kind of module would you like to make?",
-		choices: ['module', 'controller'],
+		choices: ['module', 'controller', 'directive'],
 		default: 'module'
 	}, {
 		type: 'input',
 		name: 'name',
-		message: "Name: "
+		message: "Name: ",
 		default: 'main'
 	}, {
 		type: 'input',
@@ -34,7 +34,7 @@ Generator.prototype.askFor = function askFor() {
 		when: function (r) {return r.type==='controller'},
 		type: 'confirm',
 		name: 'hasRoute',
-		message: "Does the module have a route?"
+		message: "Does the module have a route?",
 		default: false
 	}, {
 		when: function (r) {return r.hasRoute;},
@@ -44,8 +44,9 @@ Generator.prototype.askFor = function askFor() {
 	}];
 
 	this.prompt(prompts, function (results) {
+		// results.name = _.camelize(results.name);
 		results.dependencies = _.compact(results.dependencies.split(" "));
-		this.buildModule(results, 'test.js');
+		this.createModule(results, 'test.js');
 
 		done();
 	}.bind(this));
