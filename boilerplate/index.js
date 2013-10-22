@@ -7,42 +7,71 @@ var GeneratorBase = require('../generator-base.js');
 
 var _ = require('lodash');
 
-var BoilerplateGenerator = module.exports = function BoilerplateGenerator() {
+var Generator = module.exports = function Generator(args) {
   GeneratorBase.apply(this, arguments);
 
 };
 
-util.inherits(BoilerplateGenerator, GeneratorBase);
+util.inherits(Generator, GeneratorBase);
 
-BoilerplateGenerator.prototype.directories = function directories() {
-  
-  var done = this.async();
+Generator.prototype.setDirectories = function setDirectories() {
 
-  var directories = this.directories = {
-    app:         "app",
-    appviews:    "app/views",
-    public:      "public",
-    images:      "public/img",
-    styles:      "public/css",
-    scripts:     "public/js",
-    vendor:      "public/js/vendor",
-    publicviews: "public/views",
-    test:        "test",
-    specs:       "test/specs"
-  };
+	var directories = this.directories = {
+		app:         "app",
+		appviews:    "app/views",
+		public:      "public",
+		images:      "public/img",
+		styles:      "public/css",
+		scripts:     "public/js",
+		vendor:      "public/js/vendor",
+		publicviews: "public/views",
+		test:        "test",
+		specs:       "test/specs"
+	};
 
-  var templateDirectory = this.templateDirectory = path.join(this.sourceRoot(), '../../templates');
+};
 
-  this.setConfig("directories", directories);
-  this.setConfig("templateDirectory", templateDirectory);
+Generator.prototype.askFor = function askFor() {
+	if(this.args.ask===false) return;
 
-  _.each(directories, function (dir) {
-    // console.log("Creating directory: " + dir);
-    this.mkdir(dir);
-    
-    done();
-  }, this);
+	var prompts = [];
+	var done = this.async();
 
-  this.config.forceSave();
-  
+	_.each(this.directories, function (dir, key) {
+		prompts.push({
+			type: 'input',
+			name: key,
+			message: key,
+			default: dir
+		});
+	}, this);
+
+	this.prompt(prompts, function (results) {
+
+		this.directories = results;
+
+		done();
+	}.bind(this));
+};
+
+Generator.prototype.makeDirectories = function makeDirectories() {
+	var done = this.async();
+
+	_.each(this.directories, function (dir) {
+		// console.log("Creating directory: " + dir);
+		this.mkdir(dir);
+
+		done();
+	}, this);
+};
+
+Generator.prototype.saveConfiguration = function saveConfiguration() {
+
+	var templateDirectory = this.templateDirectory = path.join(this.sourceRoot(), '../../templates');
+
+	this.setConfig("directories", this.directories);
+	this.setConfig("templateDirectory", this.templateDirectory);
+
+
+	this.config.forceSave();
 };

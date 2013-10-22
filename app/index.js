@@ -7,8 +7,20 @@ var GeneratorBase = require('../generator-base.js');
 
 var _ = require('lodash');
 
-var MeanGenerator = module.exports = function MeanGenerator() {
+var Generator = module.exports = function Generator(args) {
   GeneratorBase.apply(this, arguments);
+
+  args.ask = false;
+
+  this.hookFor('mean:boilerplate', {
+    args: args
+  });
+
+  this.hookFor('mean:common');
+
+  this.hookFor('mean:build', {
+    args: args
+  });
 
   this.on('end', function () {
     // this.installDependencies({ skipInstall: options['skip-install'] });
@@ -17,9 +29,9 @@ var MeanGenerator = module.exports = function MeanGenerator() {
   this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
 };
 
-util.inherits(MeanGenerator, GeneratorBase);
+util.inherits(Generator, GeneratorBase);
 
-MeanGenerator.prototype.askFor = function askFor() {
+Generator.prototype.askFor = function askFor() {
   // have Yeoman greet the user.
   console.log(this.yeoman);
 
@@ -46,13 +58,14 @@ MeanGenerator.prototype.askFor = function askFor() {
   }];
 
   this.prompt(prompts, function (results) {
-
-    console.log(results.dependencies);
+    
     this.setConfig("dependencies", results.dependencies);
     this.dependencies = results.dependencies;
 
     done();
   }.bind(this));
+
+  this.config.forceSave();
 
 };
 

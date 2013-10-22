@@ -1,17 +1,15 @@
 'use strict';
 var util = require('util');
+var path = require('path');
 var yeoman = require('yeoman-generator');
 
-var BuildGenerator = module.exports = function BuildGenerator(args, options, config) {
-  // By calling `NamedBase` here, we get the argument to the subgenerator call
-  // as `this.name`.
-  yeoman.generators.NamedBase.apply(this, arguments);
+var GeneratorBase = require('../generator-base.js');
 
-  console.log('You called the build subgenerator with the argument ' + this.name + '.');
+var _ = require('lodash');
+
+var Generator = module.exports = function Generator() {
+  GeneratorBase.apply(this, arguments);
+
 };
 
-util.inherits(BuildGenerator, yeoman.generators.NamedBase);
-
-BuildGenerator.prototype.files = function files() {
-  this.copy('somefile.js', 'somefile.js');
-};
+util.inherits(Generator, GeneratorBase);

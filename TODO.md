@@ -24,4 +24,4 @@
     
 ## Changes to make:
 - change validation function to have an options argument instead of an optional true argument.
-- change bowerrc template to go to vendor directory. *means the flow will be: app -> boilerplate -> create bowerrc*
+- ~~change bowerrc template to go to vendor directory. *means the flow will be: app -> boilerplate -> create bowerrc*~~
