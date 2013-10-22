@@ -34,8 +34,8 @@ Generator.prototype.setDirectories = function setDirectories() {
 Generator.prototype.askFor = function askFor() {
 	if(this.args.ask===false) return;
 
-	var prompts = [];
 	var done = this.async();
+	var prompts = [];
 
 	_.each(this.directories, function (dir, key) {
 		prompts.push({
@@ -55,13 +55,10 @@ Generator.prototype.askFor = function askFor() {
 };
 
 Generator.prototype.makeDirectories = function makeDirectories() {
-	var done = this.async();
-
 	_.each(this.directories, function (dir) {
 		// console.log("Creating directory: " + dir);
 		this.mkdir(dir);
 
-		done();
 	}, this);
 };
 
@@ -72,6 +69,4 @@ Generator.prototype.saveConfiguration = function saveConfiguration() {
 	this.setConfig("directories", this.directories);
 	this.setConfig("templateDirectory", this.templateDirectory);
 
-
-	this.config.forceSave();
 };
