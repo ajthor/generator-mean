@@ -16,7 +16,9 @@ var Generator = module.exports = function Generator(args) {
     args: args
   });
 
-  this.hookFor('mean:common');
+  this.hookFor('mean:common', {
+    args: args
+  });
 
   this.hookFor('mean:build', {
     args: args
@@ -50,15 +52,10 @@ Generator.prototype.askFor = function askFor() {
       value: 'requirejs-text',
       checked: true
     }]
-  }, {
-    when: function (r) {return r.dependencies.indexOf('other') !== -1;},
-    type: 'input',
-    name: 'other',
-    message: "Other dependencies (separate with a space): "
   }];
 
   this.prompt(prompts, function (results) {
-    
+
     this.setConfig("dependencies", results.dependencies);
     this.dependencies = results.dependencies;
 

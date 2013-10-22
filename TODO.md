@@ -7,7 +7,7 @@
 - add express features
 - path property on modules?
 - add module option to module generator.
-- add argument support to module generator. Only call module generator prompt if the arguments are not set.
+- ~~add argument support to module & biolerplate generator. Only call module generator prompt if the arguments are not set.~~
 - add looping support for buildModule function.
 - add stylus support to css creation blocks
 
@@ -18,9 +18,9 @@
 - add argument to boilerplate or common generators to specify directory structure or simply set default. if hooked, create default. if called anywhere else, give prompts.
 
 ## Features to remove:
-- remove unnecessary dialog prompts
-    - remove 'other' option in main dependency creator
-    - remove route options in controller creator
+- ~~remove unnecessary dialog prompts~~
+    - ~~remove 'other' option in main dependency creator~~
+    - ~~remove route options in controller creator~~
     
 ## Changes to make:
 - change validation function to have an options argument instead of an optional true argument.

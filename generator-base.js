@@ -38,10 +38,17 @@ Generator.prototype.setConfig = function setConfig(key, value) {
 };
 
 Generator.prototype.createModule = function createModule(module, template, dest) {
+	var currentModule;
+	if(module && module.type === 'module') {
+		currentModule = module.name;
+		this.setConfig('currentModule', currentModule);
+	}
+
 	if (!this.validateModule(module)) {
 		module = _.defaults(module, {
 			name: 'main',
 			type: '',
+			module: currentModule,
 			dependencies: []
 		});
 	}
@@ -77,7 +84,7 @@ Generator.prototype.buildModule = function buildModule(module, template, dest) {
 	var output = _.template(template, module);
 
 	if (this.dependencies.indexOf('requirejs') !== -1) {
-		module.module = output;
+		module.output = output;
 
 		output = _.template(this.readFileAsString(path.join(this.templateDirectory, 'require.js')), module);
 	}

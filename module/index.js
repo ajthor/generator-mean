@@ -14,6 +14,8 @@ util.inherits(Generator, GeneratorBase);
 Generator.prototype.askFor = function askFor() {
 
 	var done = this.async();
+	var currentModule = this.config.get('currentModule');
+	currentModule = currentModule ? currentModule : "app";
 
 	var prompts = [{
 		type: 'list',
@@ -22,34 +24,29 @@ Generator.prototype.askFor = function askFor() {
 		choices: ['module', 'controller', 'directive'],
 		default: 'module'
 	}, {
+		when: function (r) {return r.type!=='module';},
+		type: 'input',
+		name: 'module',
+		message: "Module: ",
+		default: currentModule
+	}, {
 		type: 'input',
 		name: 'name',
-		message: "Name: ",
-		default: 'main'
+		message: "Name: "
 	}, {
 		type: 'input',
 		name: 'dependencies',
 		message: "Dependencies (separate with a space): "
 	}, {
-		when: function (r) {return r.type==='controller'},
+		when: function (r) {return r.type==='controller';},
 		type: 'confirm',
 		name: 'hasRoute',
 		message: "Does the module have a route?",
 		default: true
-	}, {
-		when: function (r) {return r.hasRoute;},
-		type: 'input',
-		name: 'when',
-		message: "When: "
-	}, {
-		when: function (r) {return r.hasRoute;},
-		type: 'input',
-		name: 'route',
-		message: "Route: "
 	}];
 
 	this.prompt(prompts, function (results) {
-		// results.name = _.camelize(results.name);
+
 		results.dependencies = _.compact(results.dependencies.split(" "));
 		this.createModule(results);
 
