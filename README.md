@@ -1,47 +1,50 @@
-# generator-mean [![Build Status](https://secure.travis-ci.org/ajthor/generator-mean.png?branch=master)](https://travis-ci.org/ajthor/generator-mean)
+# MEAN Generator
+MEAN Generator is a Yeoman generator for scaffolding applications based on the MEAN stack. MEAN is a set of features which work well together in creating full-stack applications.
 
-A generator for [Yeoman](http://yeoman.io).
+List of generators:
 
+- app (main)
+- boilerplate (hooked from app)
+- common (hooked from app)
+- module
+- build
 
-## Getting Started
+## app
+    yo mean
+Generator responsible for setting the configuration options for the project. Gets input from the user about what sort of features the user would like to include and adds them to the stack.
 
-### What is Yeoman?
+*Hooks for: boilerplate, common*
 
-Trick question. It's not a thing. It's this guy:
+## boilerplate
+    yo mean:boilerplate
+Generator responsible for creating scaffolding for application, including directory structure and basic files.
 
-![](http://i.imgur.com/JHaAlBJ.png)
+### Directory structure:
+    app
+    app/views
+    public
+    public/img
+    public/css
+    public/js
+    public/js/vendor
+    public/views
+    test
+    
+## common
+    yo mean:common
+Generator responsible for creating application specific files and config such as:
 
-Basically, he wears a top hat, lives in your computer, and waits for you to tell him what kind of application you wish to create.
+    bower.json
+    package.json
+    Gruntfile.js
+    
+## module 
+    yo mean:module
+Generator responsible for creating AngularJS modules which are created immediately, but also stored in a configuration file for later compilation. Currently has support for: modules, controllers, directives, filters, and services.
 
-Not every new computer comes with a Yeoman pre-installed. He lives in the [npm](https://npmjs.org) package repository. You only have to ask for him once, then he packs up and moves into your hard drive. *Make sure you clean up, he likes new and shiny things.*
+## build 
+    yo mean:build
+Generator which is responsible for building the module tree stored in the configuration. rebuilds files such as index.html to include the controllers and other required files for the application.
+Run this after creating new modules to rebuild the source for usemin tasks which are executed during grunt build tasks and correct dependency creation in modules. 
 
-```
-$ npm install -g yo
-```
-
-### Yeoman Generators
-
-Yeoman travels light. He didn't pack any generators when he moved in. You can think of a generator like a plug-in. You get to choose what type of application you wish to create, such as a Backbone application or even a Chrome extension.
-
-To install generator-mean from npm, run:
-
-```
-$ npm install -g generator-mean
-```
-
-Finally, initiate the generator:
-
-```
-$ yo mean
-```
-
-### Getting To Know Yeoman
-
-Yeoman has a heart of gold. He's a person with feelings and opinions, but he's very easy to work with. If you think he's too opinionated, he can be easily convinced.
-
-If you'd like to get to know Yeoman better and meet some of his friends, [Grunt](http://gruntjs.com) and [Bower](http://bower.io), check out the complete [Getting Started Guide](https://github.com/yeoman/yeoman/wiki/Getting-Started).
-
-
-## License
-
-[MIT License](http://en.wikipedia.org/wiki/MIT_License)
+*Running the build generator does not affect the source already in index.html, it simply adds usemin blocks to the source.*

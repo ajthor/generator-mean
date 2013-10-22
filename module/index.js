@@ -35,7 +35,7 @@ Generator.prototype.askFor = function askFor() {
 		type: 'confirm',
 		name: 'hasRoute',
 		message: "Does the module have a route?",
-		default: false
+		default: true
 	}, {
 		when: function (r) {return r.hasRoute;},
 		type: 'input',

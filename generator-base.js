@@ -8,6 +8,9 @@ var _ = require('lodash');
 var Generator = module.exports = function Generator() {
 	yeoman.generators.Base.apply(this, arguments);
 
+	this.dependencies = this.getConfig('dependencies');
+	this.directories = this.getConfig('directories');
+	this.templateDirectory = this.getConfig('templateDirectory');
 };
 
 util.inherits(Generator, yeoman.generators.Base);
@@ -16,7 +19,7 @@ Generator.prototype.getConfig = function getConfig(key) {
 	var result = this.config.get(key);
 
 	if (!result) {
-		if (arguments && arguments[1]===true) {
+		if (arguments[1]===true) {
 			console.log(arguments); 
 			throw "Config value \'" + key + "\'' is not set. Try running the generator again.";
 		}
@@ -68,21 +71,15 @@ Generator.prototype.saveModule = function saveModule(module) {
 Generator.prototype.buildModule = function buildModule(module, template, dest) {
 	this.validateModule(module);
 
-	var moduleType = module.type;
+	var outputPath = dest ? dest : path.join(this.directories.scripts, module.name+'.js');
 
-	var dependencies = this.getConfig('dependencies');
-	var directories = this.getConfig('directories');
-	var templateDirectory = this.getConfig('templateDirectory');
-
-	var outputPath = dest ? dest : path.join(directories.scripts, module.name+'.js');
-
-	template = this.readFileAsString(path.join(templateDirectory, (template ? template : moduleType+'.js')));
+	template = this.readFileAsString(path.join(this.templateDirectory, (template ? template : module.type+'.js')));
 	var output = _.template(template, module);
 
-	if (dependencies.indexOf('requirejs') !== -1) {
+	if (this.dependencies.indexOf('requirejs') !== -1) {
 		module.module = output;
 
-		output = _.template(this.readFileAsString(path.join(templateDirectory, 'require.js')), module);
+		output = _.template(this.readFileAsString(path.join(this.templateDirectory, 'require.js')), module);
 	}
 
 	yeoman.generators.Base.prototype.write.apply(this, [outputPath, output]);

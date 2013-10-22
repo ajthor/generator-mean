@@ -1,0 +1,17 @@
+{
+  "generator-mean": {
+    "directories": {
+      "app": "app",
+      "appviews": "app/views",
+      "public": "public",
+      "images": "public/img",
+      "styles": "public/css",
+      "scripts": "public/js",
+      "vendor": "public/js/vendor",
+      "publicviews": "public/views",
+      "test": "test",
+      "specs": "test/specs"
+    },
+    "templateDirectory": "/Users/adam/Dropbox/generator-mean/templates"
+  }
+}

@@ -2,7 +2,7 @@
 window.name = "NG_DEFER_BOOTSTRAP!";
 
 require( [
-	'config',
+	'rconfig',
 	'angular',
 	'app'
 ], function(angular, app) {
