@@ -28,7 +28,6 @@ var Generator = module.exports = function Generator(args) {
     // this.installDependencies({ skipInstall: options['skip-install'] });
   });
 
-  this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
 };
 
 util.inherits(Generator, GeneratorBase);
@@ -55,14 +54,20 @@ Generator.prototype.askFor = function askFor() {
   }];
 
   this.prompt(prompts, function (results) {
-
-    this.setConfig("dependencies", results.dependencies);
+    // Set dependencies to an empty array.
+    this.dependencies = [];
+    // Add dependencies which the user selected.
     this.dependencies = results.dependencies;
+    // Push on some more (default) dependencies.
+    this.dependencies.push('angular');
+    this.dependencies.push('angular-route');
+    // And send the dependencies to the configuration file.
+    this.setConfig("dependencies", this.dependencies);
 
+    // WARNING: Need this async 'done' call to ensure hooks work???
     done();
   }.bind(this));
 
-  this.config.forceSave();
 
 };
 
