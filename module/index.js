@@ -11,10 +11,35 @@ var Generator = module.exports = function Generator() {
 
 util.inherits(Generator, GeneratorBase);
 
+Generator.prototype.listModules = function listModules() {
+	var modules = this.config.get('modules');
+
+	var msg = "\nMODULE GENERATOR " +
+	"\nUse this generator to scaffold your application." +
+	"\nWhen you are done making modules, use \'yo build\'" +
+	"\nto compile modules, resolve dependencies, and add" +
+	"\nscripts to index.html file." +
+	"\n";
+
+	console.log(msg);
+
+	console.log("Current modules:\n");
+
+	_.each(modules, function (module, key) {
+		console.log(key);
+		_.each(module, function (j, key) {
+			console.log("    " + key);
+		});
+	});
+
+	console.log("\n");
+};
+
 Generator.prototype.askFor = function askFor() {
 
 	var done = this.async();
 	var currentModule = this.config.get('currentModule');
+	
 	currentModule = currentModule ? currentModule : "app";
 
 	var prompts = [{
