@@ -4,6 +4,7 @@ var path = require('path');
 var yeoman = require('yeoman-generator');
 
 var _ = require('lodash');
+var async = require('async');
 
 var Generator = module.exports = function Generator() {
 	yeoman.generators.Base.apply(this, arguments);
@@ -13,7 +14,7 @@ var Generator = module.exports = function Generator() {
 	this.dependencies = this.getConfig('dependencies');
 	this.directories = this.getConfig('directories');
 	this.templateDirectory = this.getConfig('templateDirectory');
-	
+
 };
 
 util.inherits(Generator, yeoman.generators.Base);
@@ -40,11 +41,11 @@ Generator.prototype.getConfig = function getConfig(key) {
 Generator.prototype.setConfig = function setConfig(key, value) {
 	this.config.set(key, value);
 	// Possibly force save here. Not sure yet.
-	// this.config.forceSave();
+	this.config.forceSave();
 };
 
 Generator.prototype.createModule = function createModule(module, template, dest) {
-	var path;
+	var index, compiledPath;
 	// Make sure module is 'valid'
 	if (!this.validateModule(module)) {
 		// If not, set some defaults.
@@ -59,8 +60,8 @@ Generator.prototype.createModule = function createModule(module, template, dest)
 	if (module.type === 'module') {
 		// Set it as the current working module.
 		this.setConfig('currentModule', module.name);
-		// And set the module property to an empty string.
-		module.module = "";
+		// And set the module property to the module name.
+		module.module = module.name;
 	}
 	// Otherwise, set the module property to whatever the current working module is.
 	else {
@@ -69,20 +70,26 @@ Generator.prototype.createModule = function createModule(module, template, dest)
 		}
 	}
 
-	// If destination is passed, set it here.
+	// Set the path property to be either the destination argument or 
+	// a combination of the scripts directory, the current module, and the module name.
 	if(dest) {
 		module.path = dest;
 	}
 	// Otherwise, interpret it from values.
 	else {
-		// Set the path property to be either the destination argument or 
-		// a combination of the scripts directory, the current module, and the module name.
-		path = path.join(this.directories.scripts, module.module, module.name);
+		if (module.type === 'module')
+			compiledPath = path.join(this.directories.scripts, module.name);
+		else
+			compiledPath = path.join(this.directories.scripts, module.module, module.name);
 		// path with extension.
-		module.path = path+'.js';
+		module.path = compiledPath+'.js';
 		// rpath without extension.
-		module.rpath = path;
+		module.rpath = compiledPath;
 	}
+
+	// Get just the name from the module. Exclude slashes.
+	if((index = module.name.lastIndexOf('/')) !== -1) 
+		module.name = module.name.substring(index + 1);
 
 	// Save and build.
 	this.saveModule(module);
@@ -106,38 +113,48 @@ Generator.prototype.saveModule = function saveModule(module) {
 	// If undefined, set as empty object.
 	modules || (modules = {});
 
+	// Create empty object if 'module' section does not exist yet.
+	if(!modules[module.module]) modules[module.module] = {};
 	// Set modules object to include this module.
-	modules[module.name] = module;
+	modules[module.module][module.name] = module;
 	// Save to config.
 	this.setConfig('modules', modules);
 };
 
-Generator.prototype.buildModule = function buildModule(module, template, dest) {
-	var output;
-	// Validate to make sure the module can be used here.
-	this.validateModule(module);
+Generator.prototype.buildModule = function buildModule(modules, template, dest) {
+	if (!modules) throw "Must supply a module or array of modules to build routine.";
+	// Cast to an array.
+	if (!_.isArray(modules)) modules = [modules];
 
-	// Template is either the supplied argument or the module name + .js
-	if(!template) {
-		template = module.type + '.js';
-	}
-	// Get template from file.
-	template = this.readFileAsString(path.join(this.templateDirectory, (template)));
+	// Validate to make sure the modules can be used here.
+	_.each(modules, this.validateModule(module));
 
 	// START LOOP
-	// Destination is either argument or module.path
-	// Handled here again in case 'build' is called separately from 'create'.
-	dest = dest ? dest : module.path;
-	// Output is the template with values filled in.
-	output = _.template(template, module);
-	// If require.js is specified as a component, ...
-	if (this.dependencies.indexOf('requirejs') !== -1) {
-		// Run the output through another template for require.js modules.
-		module.output = output;
-		output = _.template(this.readFileAsString(path.join(this.templateDirectory, 'require.js')), module);
-	}
-	// Finally, write it.
-	yeoman.generators.Base.prototype.write.apply(this, [dest, output]);
+	async.eachSeries(modules, function (module) {
+		var output;
+
+		// Template is either the supplied argument or the module type + .js
+		if(!template) {
+			template = module.type + '.js';
+		}
+		// Get template from file.
+		template = this.readFileAsString(path.join(this.templateDirectory, (template)));
+
+		// Destination is either argument or module.path
+		// Handled here again in case 'build' is called separately from 'create'.
+		dest = dest ? dest : module.path;
+		// Output is the template with values filled in.
+		output = _.template(template, module);
+		// If require.js is specified as a component, ...
+		if (this.dependencies.indexOf('requirejs') !== -1) {
+			// Run the output through another template for require.js modules.
+			module.output = output;
+			output = _.template(this.readFileAsString(path.join(this.templateDirectory, 'require.js')), module);
+		}
+		// Finally, write it.
+		yeoman.generators.Base.prototype.write.apply(this, [dest, output]);
+	
 	// END LOOP
+	}.bind(this));
 
 };
