@@ -75,12 +75,8 @@ Generator.prototype.createModule = function createModule(module, template, dest)
 	if(dest) {
 		module.path = dest;
 	}
-	// Otherwise, interpret it from values.
 	else {
-		if (module.type === 'module')
-			compiledPath = path.join(this.directories.scripts, module.name);
-		else
-			compiledPath = path.join(this.directories.scripts, module.module, module.name);
+		compiledPath = path.join(this.directories.scripts, module.module, module.name);
 		// path with extension.
 		module.path = compiledPath+'.js';
 		// rpath without extension.
@@ -93,7 +89,7 @@ Generator.prototype.createModule = function createModule(module, template, dest)
 
 	// Save and build.
 	this.saveModule(module);
-	this.buildModule(module, template, dest);
+	this.buildModules(module, template, dest);
 };
 
 Generator.prototype.validateModule = function validateModule(module) {
@@ -113,36 +109,45 @@ Generator.prototype.saveModule = function saveModule(module) {
 	// If undefined, set as empty object.
 	modules || (modules = {});
 
-	// Create empty object if 'module' section does not exist yet.
-	if(!modules[module.module]) modules[module.module] = {};
 	// Set modules object to include this module.
-	modules[module.module][module.name] = module;
+	modules[module.name] = module;
 	// Save to config.
 	this.setConfig('modules', modules);
 };
 
-Generator.prototype.buildModule = function buildModule(modules, template, dest) {
+Generator.prototype.saveScriptPath = function saveScriptPath(path) {
+	// Get current scripts object.
+	var scripts = this.getConfig('scripts', false);
+	// If undefined, set as empty object.
+	scripts || (scripts = []);
+
+	// Set scripts object to include this module.
+	scripts.push(path);
+	// Save to config.
+	this.setConfig('scripts', scripts);
+};
+
+Generator.prototype.buildModules = function buildModules(modules, template, dest) {
 	if (!modules) throw "Must supply a module or array of modules to build routine.";
+
 	// Cast to an array.
 	if (!_.isArray(modules)) modules = [modules];
 
-	// Validate to make sure the modules can be used here.
-	_.each(modules, this.validateModule(module));
-
 	// START LOOP
 	async.eachSeries(modules, function (module) {
-		var output;
+		var i, result, output;
 
 		// Template is either the supplied argument or the module type + .js
 		if(!template) {
 			template = module.type + '.js';
 		}
 		// Get template from file.
-		template = this.readFileAsString(path.join(this.templateDirectory, (template)));
-
+		template = this.readFileAsString(path.join(this.templateDirectory, template));
+		
 		// Destination is either argument or module.path
 		// Handled here again in case 'build' is called separately from 'create'.
 		dest = dest ? dest : module.path;
+
 		// Output is the template with values filled in.
 		output = _.template(template, module);
 		// If require.js is specified as a component, ...
@@ -156,5 +161,11 @@ Generator.prototype.buildModule = function buildModule(modules, template, dest) 
 	
 	// END LOOP
 	}.bind(this));
+};
+
+Generator.prototype.buildIndex = function buildIndex() {
 
 };
+
+
+

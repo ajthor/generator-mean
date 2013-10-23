@@ -15,10 +15,8 @@ Generator.prototype.listModules = function listModules() {
 	var modules = this.config.get('modules');
 
 	var msg = "\nMODULE GENERATOR " +
-	"\nUse this generator to scaffold your application." +
-	"\nWhen you are done making modules, use \'yo build\'" +
-	"\nto compile modules, resolve dependencies, and add" +
-	"\nscripts to index.html file." +
+	"\nUse this generator to scaffold your application. When you are done making modules, use" +
+	"\n[yo mean:build] to compile modules, resolve dependencies, and add scripts to index.html file." +
 	"\n";
 
 	console.log(msg);
@@ -27,9 +25,6 @@ Generator.prototype.listModules = function listModules() {
 
 	_.each(modules, function (module, key) {
 		console.log(key);
-		_.each(module, function (j, key) {
-			console.log("    " + key);
-		});
 	});
 
 	console.log("\n");
