@@ -64,6 +64,13 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
     "angular-ui-utils": "*"
   };
 
+  this.pushToConfig("scripts", "jquery", path.join("js/vendor/jquery/jquery.min.js"));
+  this.pushToConfig("scripts", "angular", path.join("js/vendor/angular/angular.min.js"));
+  this.pushToConfig("scripts", "angular-bootstrap", path.join("js/vendor/angular-bootstrap/ui-bootstrap.min.js"));
+  this.pushToConfig("scripts", "angular-route", path.join("js/vendor/angular-route/angular-route.min.js"));
+
+  this.showConfig("scripts");
+
   _.each(this.components, function (component) {
     bowerConfig.dependencies[component] = "*";
   });

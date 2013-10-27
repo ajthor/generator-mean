@@ -109,14 +109,14 @@ Generator.prototype.createModule = function createModule(obj) {
 	module = this.validateModule(module);
 	
 	console.log("Adding " + module.path + " to {scripts} configuration.");
-	this.pushToConfig("scripts", module.path, module.name);
+	this.pushToConfig("scripts", module.name, module.path);
 
 	return module;
 };
 
-Generator.prototype.pushToConfig = function pushToConfig(name, value, key, force) {
+Generator.prototype.pushToConfig = function pushToConfig(name, key, value, force) {
 	if(!name || !value || !key) throw "ERR: Must supply non-falsey arguments to \'pushToConfig\' function.";
-	return (function (name, value, key, force) {
+	return (function (name, key, value, force) {
 
 		var config = this.config.get(name) || {};
 		config[key] = value;
@@ -126,8 +126,10 @@ Generator.prototype.pushToConfig = function pushToConfig(name, value, key, force
 
 		return config;
 
-	}.bind(this))(name, value, key, force);
+	}.bind(this))(name, key, value, force);
 };
+
+Generator.prototype.showConfig = function showConfig(name) {console.log(this.config.get(name));};
 
 
 Generator.prototype.parseTemplate = function parseTemplate(template, module) {
@@ -141,7 +143,7 @@ Generator.prototype.parseTemplate = function parseTemplate(template, module) {
 	if(this.components.requirejs) {
 		input = {};
 		_.extend(input, module);
-		input.module = output;
+		input.output = output;
 
 		requirejsTemplate = this.getTemplate('requirejs.js');
 
