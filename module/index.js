@@ -14,13 +14,6 @@ util.inherits(Generator, GeneratorBase);
 Generator.prototype.listModules = function listModules() {
 	var modules = this.config.get('modules');
 
-	var msg = "\nMODULE GENERATOR " +
-	"\nUse this generator to scaffold your application. When you are done making modules, use" +
-	"\n[yo mean:build] to compile modules, resolve dependencies, and add scripts to index.html file." +
-	"\n";
-
-	console.log(msg);
-
 	console.log("Current modules:\n");
 
 	_.each(modules, function (module, key) {
