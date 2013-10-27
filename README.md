@@ -7,7 +7,6 @@ List of generators:
 - boilerplate (hooked from app)
 - common (hooked from app)
 - module
-- build
 
 ## app
     yo mean
@@ -17,9 +16,9 @@ Generator responsible for setting the configuration options for the project. Get
 
 ## boilerplate
     yo mean:boilerplate
-Generator responsible for creating scaffolding for application, including directory structure and basic files.
+Generator responsible for creating scaffolding for application, including directory structure and basic files. Call this generator standalone to specify custom directories for files.
 
-### Directory structure:
+### Default Directory Structure:
     app
     app/views
     public
@@ -40,4 +39,4 @@ Generator responsible for creating application specific files and config such as
     
 ## module 
     yo mean:module
-Generator responsible for creating AngularJS modules which are created immediately, but also stored in a configuration file for later compilation. Currently has support for: modules, controllers, directives, filters, and services.
+Generator responsible for creating AngularJS modules which are created immediately, but also stored in a configuration file for later compilation (feature to come later). Currently has support for: modules, controllers, directives, filters, and services.
