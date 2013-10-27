@@ -1,5 +1,6 @@
 'use strict';
 var util = require('util');
+var path = require('path');
 var GeneratorBase = require('../generator-base.js');
 
 var _ = require('lodash');
@@ -11,58 +12,29 @@ var Generator = module.exports = function Generator() {
 
 util.inherits(Generator, GeneratorBase);
 
-Generator.prototype.listModules = function listModules() {
-	var modules = this.config.get('modules');
-
-	console.log("Current modules:\n");
-
-	_.each(modules, function (module, key) {
-		console.log(key);
-	});
-
-	console.log("\n");
-};
-
 Generator.prototype.askFor = function askFor() {
-
-	var done = this.async();
-	var currentModule = this.config.get('currentModule');
 	
-	currentModule = currentModule ? currentModule : "app";
+	var done = this.async();
 
-	var prompts = [{
-		type: 'list',
-		name: 'type',
-		message: "What kind of module would you like to make?",
-		choices: ['module', 'controller', 'directive'],
-		default: 'module'
-	}, {
-		when: function (r) {return r.type!=='module';},
-		type: 'input',
-		name: 'module',
-		message: "Module: ",
-		default: currentModule
-	}, {
-		type: 'input',
-		name: 'name',
-		message: "Name: "
-	}, {
-		type: 'input',
-		name: 'dependencies',
-		message: "Dependencies (separate with a space): "
-	}, {
-		when: function (r) {return r.type==='controller';},
-		type: 'confirm',
-		name: 'hasRoute',
-		message: "Does the module have a route?",
-		default: true
-	}];
+	this.getModuleValues(function (r) {
 
-	this.prompt(prompts, function (results) {
+		r.dependencies = _.compact(r.dependencies.split(" "));
+		r.path = path.join(r.path, r.name) + ".js";
 
-		results.dependencies = _.compact(results.dependencies.split(" "));
-		this.createModule(results);
+		this.module = r;
 
 		done();
-	}.bind(this));
+	});
+};
+
+Generator.prototype.makeModule = function makeModule() {
+
+	this.module = this.createModule(this.module);
+
+	var template = this.getTemplate('javascript/module.js');
+
+	var output = this.parseTemplate(template, this.module);
+
+	this.writeModule(this.module.path, output);
+
 };

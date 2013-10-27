@@ -69,8 +69,6 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
   this.pushToConfig("scripts", "angular-bootstrap", path.join("js/vendor/angular-bootstrap/ui-bootstrap.min.js"));
   this.pushToConfig("scripts", "angular-route", path.join("js/vendor/angular-route/angular-route.min.js"));
 
-  this.showConfig("scripts");
-
   _.each(this.components, function (component) {
     bowerConfig.dependencies[component] = "*";
   });
@@ -96,16 +94,11 @@ Generator.prototype.copyGruntfile = function copyGruntfile() {
 
 Generator.prototype.writeIndexFile = function writeIndexFile() {
   if(this.options['config-only']===true) return;
+
   this.indexFile = this.readFileAsString(path.join(this.devDirectories.templates, 'boilerplate/public/index.html'));
   this.indexFile = this.engine(this.indexFile, this);
 
-  if(this.components.requirejs) {
-    this.indexFile = this.appendScripts(this.indexFile, 'js/main.js', 
-      [path.join(this.directories.vendor, 'requirejs/require.js')], {'data-main': path.join(this.directories.scripts, 'main')});
-  } else {
-    this.indexFile = this.appendScripts(this.indexFile, 'js/main.js',
-      _.toArray(this.config.get("scripts")));
-  }
+  this.indexFile = this.writeScriptsToFile(this.indexFile);
 
   this.write(path.join(this.directories.public, 'index.html'), this.indexFile);
 };

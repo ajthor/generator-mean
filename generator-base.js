@@ -56,11 +56,12 @@ Generator.prototype.setConfigFile = function setConfigFile(dest, obj, isModule) 
 
 Generator.prototype.validateModule = function validateModule(module) {
 	if(!module) throw "ERR: 'module' is falsey: " + module;
-	return module = _.defaults(module, {
+	module = _.defaults(module, {
 		name: _.uniqueId(),
 		dependencies: [],
 		path: this.directories.scripts
 	});
+	return module;
 };
 
 Generator.prototype.getTemplate = function getTemplate(templateName) {
@@ -69,10 +70,11 @@ Generator.prototype.getTemplate = function getTemplate(templateName) {
 	}.bind(this))(templateName);
 };
 
-Generator.prototype.getModuleValues = function getModuleValues() {
+Generator.prototype.getModuleValues = function getModuleValues(callback) {
 	var results = {};
+	
 	var done = this.async();
-	var pathMsg = (function () {return "Path: " + this.directories.scripts;}.bind(this));
+	var pathMsg = function () {return this.directories.scripts;}.bind(this);
 
 	var prompts = [{
 		name: 'name',
@@ -85,15 +87,11 @@ Generator.prototype.getModuleValues = function getModuleValues() {
 	}, {
 		name: 'path',
 		type: 'input',
-		message: pathMsg
+		message: 'Path: ',
+		default: pathMsg()
 	}];
 
-	this.prompt(prompts, function (r) {
-
-		results = r;
-
-		done();
-	}.bind(this));
+	this.prompt(prompts, callback.bind(this));
 
 	return results;
 };
@@ -102,11 +100,7 @@ Generator.prototype.createModule = function createModule(obj) {
 	if(!obj) throw "ERR: Must supply non-falsey arguments to \'createModule\' function.";
 	var module = {};
 
-	module.name = obj.name;
-	module.dependencies = obj.dependencies;
-	module.path = path.join(this.directories.scripts, obj.path);
-
-	module = this.validateModule(module);
+	module = this.validateModule(obj);
 	
 	console.log("Adding " + module.path + " to {scripts} configuration.");
 	this.pushToConfig("scripts", module.name, module.path);
@@ -131,7 +125,6 @@ Generator.prototype.pushToConfig = function pushToConfig(name, key, value, force
 
 Generator.prototype.showConfig = function showConfig(name) {console.log(this.config.get(name));};
 
-
 Generator.prototype.parseTemplate = function parseTemplate(template, module) {
 	if(!template || !module) throw "ERR: Must supply non-falsey arguments to \'parseTemplate\' function.";
 	var input, output, requirejsTemplate;
@@ -140,17 +133,52 @@ Generator.prototype.parseTemplate = function parseTemplate(template, module) {
 
 	output = _.template(template, input);
 
-	if(this.components.requirejs) {
-		input = {};
-		_.extend(input, module);
+	if(this.components.indexOf('requirejs') !== -1) {
+		input = module;
 		input.output = output;
 
-		requirejsTemplate = this.getTemplate('requirejs.js');
+		requirejsTemplate = this.getTemplate('javascript/require.js');
 
 		output = _.template(requirejsTemplate, input);
+
 	}
 
 	return output;
 };
 
+Generator.prototype.writeModule = function writeModule(path, output) {
+	this.write(path, output);
+};
 
+Generator.prototype.getScriptBlock = function getScriptBlock(file) {
+	var start = file.indexOf('<!-- build:js js/main.js -->');
+	var finish = file.indexOf('<!-- endbuild -->') + 17;
+
+	return file.slice(start, finish);
+};
+
+Generator.prototype.generateScriptBlock = function generateScriptBlock(path, files) {
+	return this.generateBlock("js", path, files);
+};
+
+Generator.prototype.replaceScriptBlock = function replaceScriptBlock(file, newBlock) {
+	var oldBlock = this.getScriptBlock(file);
+	return file.replace(oldBlock, newBlock);
+};
+
+Generator.prototype.writeScriptsToFile = function writeScriptsToFile(file) {
+	
+	if(this.components.indexOf('requirejs') !== -1) {
+		file = this.appendScripts(file, 'js/main.js', [path.join(this.directories.vendor, 'requirejs/require.js')], {'data-main': path.join(this.directories.scripts, 'main')});
+	} else {
+		file = this.appendScripts(file, 'js/main.js', _.toArray(this.config.get("scripts")));
+	}
+
+	return file;
+
+};
+
+
+        // <!-- build:js js/main.js -->
+        // <% _.each(scripts, function (script) { %><script src="<%= script %>"></script><% }); %>
+        // <!-- endbuild -->
