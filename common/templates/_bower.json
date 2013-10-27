@@ -1,9 +1,0 @@
-{
-	"name": "package",
-	"version": "0.0.0",
-	"dependencies": {
-		<% for(var i in dependencies) { %>"<%= dependencies[i] %>": "*"<% if(i<dependencies.length-1) { %>,
-		<% }}; %>
-	}
-}
-

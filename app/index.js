@@ -7,25 +7,31 @@ var GeneratorBase = require('../generator-base.js');
 
 var _ = require('lodash');
 
-var Generator = module.exports = function Generator(args) {
+var Generator = module.exports = function Generator(args, options, config) {
   GeneratorBase.apply(this, arguments);
 
-  args.ask = false;
+  this.option("dont-ask");
 
   this.hookFor('mean:boilerplate', {
-    args: args
+    args: args,
+    options: {
+      options: {
+        "dont-ask": this.options["dont-ask"] || true
+      }
+    }
   });
 
   this.hookFor('mean:common', {
-    args: args
-  });
-
-  this.hookFor('mean:build', {
-    args: args
+    args: args,
+    options: {
+      options: {
+        "config-only": false
+      }
+    }
   });
 
   this.on('end', function () {
-    // this.installDependencies({ skipInstall: options['skip-install'] });
+    this.installDependencies({ skipInstall: options['skip-install'] });
   });
 
 };
@@ -33,6 +39,9 @@ var Generator = module.exports = function Generator(args) {
 util.inherits(Generator, GeneratorBase);
 
 Generator.prototype.askFor = function askFor() {
+  // If the argument 'dont-ask' was set, return.
+  if(this.options["dont-ask"]===true) return;
+
   // have Yeoman greet the user.
   console.log(this.yeoman);
 
@@ -40,29 +49,29 @@ Generator.prototype.askFor = function askFor() {
 
   var prompts = [{
     type: 'checkbox',
-    name: 'dependencies',
+    name: 'components',
     message: "What else would you like?",
     choices: [{
       name: 'RequireJS Support',
       value: 'requirejs',
       checked: true
     }, {
-      name: 'RequireJS Text Plugin',
-      value: 'requirejs-text',
+      name: 'Twitter Bootstrap',
+      value: 'bootstrap',
       checked: true
     }]
   }];
 
   this.prompt(prompts, function (results) {
-    // Set dependencies to an empty array.
-    this.dependencies = [];
-    // Add dependencies which the user selected.
-    this.dependencies = results.dependencies;
-    // Push on some more (default) dependencies.
-    this.dependencies.push('angular');
-    this.dependencies.push('angular-route');
-    // And send the dependencies to the configuration file.
-    this.setConfig("dependencies", this.dependencies);
+    // Set components to an empty array.
+    this.components = [];
+    // Add components which the user selected.
+    _.each(results.components, function (component) {
+      this.components.push(component);
+    }, this);
+    // And send the components to the configuration file.
+    this.config.set("components", this.components);
+    this.config.forceSave();
 
     // WARNING: Need this async 'done' call to ensure hooks work???
     done();
@@ -70,4 +79,6 @@ Generator.prototype.askFor = function askFor() {
 
 
 };
+
+
 
