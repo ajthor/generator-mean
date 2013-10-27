@@ -31,179 +31,124 @@ Generator.prototype.instructions = function instructions(msg) {
 	return output;
 };
 
-Generator.prototype.getBowerConfig = function getBowerConfig(msg) {
-	return (function () {
-		var file = JSON.parse(this.readFileAsString(path.join(this.destinationRoot(), 'bower.json')));
-		return file;
-	})();
+Generator.prototype.getBowerConfig = function getBowerConfig() {return this.getConfigFile('bower.json');};
+
+Generator.prototype.getPackageConfig = function getPackageConfig() {return this.getConfigFile('package.json');};
+
+Generator.prototype.getConfigFile = function getConfigFile(fileName) {
+	if(!fileName) throw "ERR: Must supply non-falsey arguments to \'getConfigFile\' function.";
+	return (function (fname) {
+		var file = JSON.parse(this.readFileAsString(path.join(this.destinationRoot(), fileName)));
+		return (file=='undefined') ? file : {};
+	}.bind(this))(fileName);
 };
 
-Generator.prototype.getPackageConfig = function getPackageConfig(msg) {
-	return (function () {
-		var file = JSON.parse(this.readFileAsString(path.join(this.destinationRoot(), 'package.json')));
-		return file;
-	})();
-};
-
-// Generator.prototype.getConfig = function getConfig(key) {
-// 	// Fetch a result.
-// 	var result = this.config.get(key);
-// 	// If the result is undefined,
-// 	if (!result) {
-// 		// Throw an error if optional second argument is passed.
-// 		if (arguments[1]===true) {
-// 			console.log(arguments); 
-// 			throw "Config value \'" + key + "\'' is not set. Try running the generator again.";
-// 		}
-// 		// Or just return void if you don't want to break anything.
-// 		else { 
-// 			return void 0;
-// 		}
-// 	}
-// 	// And return the result if everything is fine.
-// 	return result;
-// };
-// Generator.prototype.setConfig = function setConfig(key, value) {
-// 	this.config.set(key, value);
-// 	// Possibly force save here. Not sure yet.
-// 	this.config.forceSave();
-// };
-
-Generator.prototype.validateModule = function validateModule(module) {};
-Generator.prototype.buildModule = function buildModule(module, dest) {};
-
-Generator.prototype.getIndex = function getIndex(src) {};
-
-Generator.prototype.saveIndex = function saveIndex(dest) {};
-
-// Generator.prototype.createModule = function createModule(module, template, dest) {
-// 	var index, compiledPath;
-// 	// Make sure module is 'valid'
-// 	if (!this.validateModule(module)) {
-// 		// If not, set some defaults.
-// 		module = _.defaults(module, {
-// 			name: 'main',
-// 			type: 'module',
-// 			dependencies: []
-// 		});
-// 	}
-
-// 	// If the module is a 'module', ...
-// 	if (module.type === 'module') {
-// 		// Set it as the current working module.
-// 		this.setConfig('currentModule', module.name);
-// 		// And set the module property to the module name.
-// 		module.module = module.name;
-// 	}
-// 	// Otherwise, set the module property to whatever the current working module is.
-// 	else {
-// 		if(!module.module) {
-// 			module.module = this.config.get('currentModule');
-// 		}
-// 	}
-
-// 	// Set the path property to be either the destination argument or 
-// 	// a combination of the scripts directory, the current module, and the module name.
-// 	if(dest) {
-// 		module.path = dest;
-// 	}
-// 	else {
-// 		compiledPath = path.join(this.directories.scripts, module.module, module.name);
-// 		// path with extension.
-// 		module.path = compiledPath+'.js';
-// 		// rpath without extension.
-// 		module.rpath = compiledPath;
-// 	}
-
-// 	// Get just the name from the module. Exclude slashes.
-// 	if((index = module.name.lastIndexOf('/')) !== -1) 
-// 		module.name = module.name.substring(index + 1);
-
-// 	// Save and build.
-// 	this.saveModule(module);
-// 	this.buildModules(module, template, dest);
-// };
-
-// Generator.prototype.validateModule = function validateModule(module) {
-// 	// If the module is undefined, ...
-// 	if (!module) throw "Module is undefined. Value: " + module;
-// 	// or has any missing values, ...
-// 	var conditionOne = _.has(module, 'name');
-// 	var conditionTwo = _.has(module, 'value');
-// 	var conditionThree = _.has(module, 'dependencies');
-// 	// return false. Otherwise, true.
-// 	return (!conditionOne || !conditionTwo || !conditionThree) ? false : true;
-// };
-
-// Generator.prototype.saveModule = function saveModule(module) {
-// 	// Get current modules object.
-// 	var modules = this.getConfig('modules', false);
-// 	// If undefined, set as empty object.
-// 	modules || (modules = {});
-
-// 	// Set modules object to include this module.
-// 	modules[module.name] = module;
-// 	// Save to config.
-// 	this.setConfig('modules', modules);
-// };
-
-// Generator.prototype.saveScriptPath = function saveScriptPath(path) {
-// 	// Get current scripts object.
-// 	var scripts = this.getConfig('scripts', false);
-// 	// If undefined, set as empty object.
-// 	scripts || (scripts = []);
-
-// 	// Set scripts object to include this module.
-// 	scripts.push(path);
-// 	// Save to config.
-// 	this.setConfig('scripts', scripts);
-// };
-
-// Generator.prototype.buildModules = function buildModules(modules, template, dest) {
-// 	if (!modules) throw "Must supply a module or array of modules to build routine.";
-
-// 	// Cast to an array.
-// 	if (!_.isArray(modules)) modules = [modules];
-
-// 	// START LOOP
-// 	async.eachSeries(modules, function (module) {
-// 		var i, result, output;
-
-// 		// Template is either the supplied argument or the module type + .js
-// 		if(!template) {
-// 			template = module.type + '.js';
-// 		}
-// 		// Get template from file.
-// 		template = this.readFileAsString(path.join(this.templateDirectory, template));
-		
-// 		// Destination is either argument or module.path
-// 		// Handled here again in case 'build' is called separately from 'create'.
-// 		module.path = dest ? dest : module.path;
-
-// 		// Output is the template with values filled in.
-// 		output = _.template(template, module);
-// 		// If require.js is specified as a component, ...
-// 		if (this.components.indexOf('requirejs') !== -1) {
-// 			// Run the output through another template for require.js modules.
-// 			module.output = output;
-// 			output = _.template(this.readFileAsString(path.join(this.templateDirectory, 'require.js')), module);
-// 		}
-// 		// Finally, write it.
-// 		yeoman.generators.Base.prototype.write.apply(this, [module.path, output]);
+Generator.prototype.setConfigFile = function setConfigFile(dest, obj, isModule) {
+	if(!obj || !dest) throw "ERR: Must supply non-falsey arguments to \'setConfigFile\' function.";
+	var output, parsed = JSON.stringify(obj);
 	
-// 	// END LOOP
-// 	}.bind(this));
-// };
+	if(isModule===true) output = "module.exports = " + parsed + ";";
+	else output = parsed;
+	
+	this.write(dest, output);
+};
 
-// Generator.prototype.buildIndex = function buildIndex() {
-// 	this.indexFile = this.readFileAsString(path.join(this.templateDirectory, 'boilerplate/index.html'));
-// 	this.indexFile = this.engine(this.indexFile, this);
 
-// 	this.indexFile = this.appendScripts(this.indexFile, 'js/main.js', ['js/main.js']);
+Generator.prototype.validateModule = function validateModule(module) {
+	if(!module) throw "ERR: 'module' is falsey: " + module;
+	return module = _.defaults(module, {
+		name: _.uniqueId(),
+		dependencies: [],
+		path: this.directories.scripts
+	});
+};
 
-// 	this.write(this.directories.publicviews, this.indexFile);
+Generator.prototype.getTemplate = function getTemplate(templateName) {
+	return (function (fname) {
+		return this.readFileAsString(path.join(this.devDirectories.templates, fname));
+	}.bind(this))(templateName);
+};
 
-// };
+Generator.prototype.getModuleValues = function getModuleValues() {
+	var results = {};
+	var done = this.async();
+	var pathMsg = (function () {return "Path: " + this.directories.scripts;}.bind(this));
 
+	var prompts = [{
+		name: 'name',
+		type: 'input',
+		message: 'Name: '
+	}, {
+		name: 'dependencies',
+		type: 'input',
+		message: 'Dependencies: '
+	}, {
+		name: 'path',
+		type: 'input',
+		message: pathMsg
+	}];
+
+	this.prompt(prompts, function (r) {
+
+		results = r;
+
+		done();
+	}.bind(this));
+
+	return results;
+};
+
+Generator.prototype.createModule = function createModule(obj) {
+	if(!obj) throw "ERR: Must supply non-falsey arguments to \'createModule\' function.";
+	var module = {};
+
+	module.name = obj.name;
+	module.dependencies = obj.dependencies;
+	module.path = path.join(this.directories.scripts, obj.path);
+
+	module = this.validateModule(module);
+	
+	console.log("Adding " + module.path + " to {scripts} configuration.");
+	this.pushToConfig("scripts", module.path, module.name);
+
+	return module;
+};
+
+Generator.prototype.pushToConfig = function pushToConfig(name, value, key, force) {
+	if(!name || !value || !key) throw "ERR: Must supply non-falsey arguments to \'pushToConfig\' function.";
+	return (function (name, value, key, force) {
+
+		var config = this.config.get(name) || {};
+		config[key] = value;
+	
+		this.config.set(name, config);
+		if(force) this.config.forceSave();
+
+		return config;
+
+	}.bind(this))(name, value, key, force);
+};
+
+
+Generator.prototype.parseTemplate = function parseTemplate(template, module) {
+	if(!template || !module) throw "ERR: Must supply non-falsey arguments to \'parseTemplate\' function.";
+	var input, output, requirejsTemplate;
+	
+	input = this.validateModule(module);
+
+	output = _.template(template, input);
+
+	if(this.components.requirejs) {
+		input = {};
+		_.extend(input, module);
+		input.module = output;
+
+		requirejsTemplate = this.getTemplate('requirejs.js');
+
+		output = _.template(requirejsTemplate, input);
+	}
+
+	return output;
+};
 
 
