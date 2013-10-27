@@ -157,16 +157,14 @@ Generator.prototype.getScriptBlock = function getScriptBlock(file) {
 	return file.slice(start, finish);
 };
 
-Generator.prototype.generateScriptBlock = function generateScriptBlock(path, files) {
-	return this.generateBlock("js", path, files);
-};
-
 Generator.prototype.replaceScriptBlock = function replaceScriptBlock(file, newBlock) {
 	var oldBlock = this.getScriptBlock(file);
 	return file.replace(oldBlock, newBlock);
 };
 
 Generator.prototype.writeScriptsToFile = function writeScriptsToFile(file) {
+
+	file = this.replaceScriptBlock(file, "");
 	
 	if(this.components.indexOf('requirejs') !== -1) {
 		file = this.appendScripts(file, 'js/main.js', [path.join(this.directories.vendor, 'requirejs/require.js')], {'data-main': path.join(this.directories.scripts, 'main')});

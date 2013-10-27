@@ -37,4 +37,9 @@ Generator.prototype.makeModule = function makeModule() {
 
 	this.writeModule(this.module.path, output);
 
+	this.indexFile = this.readFileAsString(path.join(this.directories.public, 'index.html'));
+	this.indexFile = this.writeScriptsToFile(this.indexFile);
+
+	this.write(path.join(this.directories.public, 'index.html'), this.indexFile);
+
 };
