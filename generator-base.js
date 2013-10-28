@@ -43,23 +43,24 @@ Generator.prototype.getConfigFile = function getConfigFile(fileName) {
 	}.bind(this))(fileName);
 };
 
-Generator.prototype.setConfigFile = function setConfigFile(dest, obj, isModule) {
+Generator.prototype.setConfigFile = function setConfigFile(dest, obj, type) {
 	if(!obj || !dest) throw "ERR: Must supply non-falsey arguments to \'setConfigFile\' function.";
 	var output, parsed = JSON.stringify(obj);
 	
-	if(isModule===true) output = "module.exports = " + parsed + ";";
+	if(type==="module") output = "module.exports = " + parsed + ";";
+	else if(type==="requirejs") output = "require.config(" + parsed + ");";
 	else output = parsed;
 	
 	this.write(dest, output);
 };
 
-
 Generator.prototype.validateModule = function validateModule(module) {
 	if(!module) throw "ERR: 'module' is falsey: " + module;
 	module = _.defaults(module, {
 		name: _.uniqueId(),
+		type: 'module',
 		dependencies: [],
-		path: this.directories.scripts
+		path: this.devDirectories.relScripts
 	});
 	return module;
 };
@@ -70,11 +71,12 @@ Generator.prototype.getTemplate = function getTemplate(templateName) {
 	}.bind(this))(templateName);
 };
 
-Generator.prototype.getModuleValues = function getModuleValues(callback) {
+Generator.prototype.promptForModuleValues = function promptForModuleValues(extraPrompts, callback) {
+	if(!_.isArray(extraPrompts)) throw "Must pass an array to \'promptForModuleValues\' function.";
 	var results = {};
 	
 	var done = this.async();
-	var pathMsg = function () {return this.directories.scripts;}.bind(this);
+	var pathMsg = function () {return "(Path) " + this.directories.scripts;}.bind(this);
 
 	var prompts = [{
 		name: 'name',
@@ -87,20 +89,21 @@ Generator.prototype.getModuleValues = function getModuleValues(callback) {
 	}, {
 		name: 'path',
 		type: 'input',
-		message: 'Path: ',
-		default: pathMsg()
+		message: pathMsg()
 	}];
+
+	prompts = _.union(prompts, extraPrompts);
 
 	this.prompt(prompts, callback.bind(this));
 
 	return results;
 };
 
-Generator.prototype.createModule = function createModule(obj) {
-	if(!obj) throw "ERR: Must supply non-falsey arguments to \'createModule\' function.";
+Generator.prototype.createModule = function createModule(values) {
+	if(!values) throw "ERR: Must supply non-falsey arguments to \'createModule\' function.";
 	var module = {};
 
-	module = this.validateModule(obj);
+	module = this.validateModule(values);
 	
 	console.log("Adding " + module.path + " to {scripts} configuration.");
 	this.pushToConfig("scripts", module.name, module.path);
@@ -125,7 +128,7 @@ Generator.prototype.pushToConfig = function pushToConfig(name, key, value, force
 
 Generator.prototype.showConfig = function showConfig(name) {console.log(this.config.get(name));};
 
-Generator.prototype.parseTemplate = function parseTemplate(template, module) {
+Generator.prototype.parseTemplate = function parseTemplate(template, module, type) {
 	if(!template || !module) throw "ERR: Must supply non-falsey arguments to \'parseTemplate\' function.";
 	var input, output, requirejsTemplate;
 	
@@ -137,7 +140,8 @@ Generator.prototype.parseTemplate = function parseTemplate(template, module) {
 		input = module;
 		input.output = output;
 
-		requirejsTemplate = this.getTemplate('javascript/require.js');
+		if(type==='noreturn') requirejsTemplate = this.getTemplate('javascript/require-noreturn.js');
+		else requirejsTemplate = this.getTemplate('javascript/require.js');
 
 		output = _.template(requirejsTemplate, input);
 
@@ -146,7 +150,21 @@ Generator.prototype.parseTemplate = function parseTemplate(template, module) {
 	return output;
 };
 
-Generator.prototype.writeModule = function writeModule(path, output) {
+Generator.prototype.writeModule = function writeModule(path, template, module) {
+	if(!path || !template || !module) throw "Must supply non-falsey values to \'writeModule\'!";
+	var output = this.parseTemplate(template, module);
+
+	this.write(path + '.js', output);
+};
+
+Generator.prototype.writeSpec = function writeSpec(path, module) {
+	if(!path || !module) throw "Must supply non-falsey values to \'writeSpec\'!";
+	var template = this.getTemplate('spec/spec.js');
+	var output = this.parseTemplate(template, module, "noreturn");
+
+	path.replace(/\.[^/.]+$/, "");
+	path = path + ".spec.js";
+
 	this.write(path, output);
 };
 
@@ -162,21 +180,41 @@ Generator.prototype.replaceScriptBlock = function replaceScriptBlock(file, newBl
 	return file.replace(oldBlock, newBlock);
 };
 
-Generator.prototype.writeScriptsToFile = function writeScriptsToFile(file) {
+Generator.prototype.makeScriptsRelativeTo = function makeScriptsRelativeTo(scripts, path) {
+	if(!scripts) throw "Must supply scripts to \'makeScriptsRelativeTo\' function.";
+	if(!_.isArray(scripts)) scripts = [scripts];
 
-	file = this.replaceScriptBlock(file, "");
+	var remove = path.substring(0, path.lastIndexOf('/')+1);
+	
+	for(var i=0; i<scripts.length; i++) {
+		scripts[i] = scripts[i].replace(remove, "");
+	}
+
+	return scripts;
+};
+
+Generator.prototype.wireScriptBlockToFile = function wireScriptBlockToFile(file, scripts, replace) {
+
+	if(replace) file = this.replaceScriptBlock(file, "");
 	
 	if(this.components.indexOf('requirejs') !== -1) {
-		file = this.appendScripts(file, 'js/main.js', [path.join(this.directories.vendor, 'requirejs/require.js')], {'data-main': path.join(this.directories.scripts, 'main')});
+		file = this.appendScripts(file, 'js/main.js', [path.join(this.devDirectories.relVendor, 'requirejs/require.js')], {'data-main': path.join(this.devDirectories.relScripts, 'main')});
 	} else {
-		file = this.appendScripts(file, 'js/main.js', _.toArray(this.config.get("scripts")));
+		file = this.appendScripts(file, 'js/main.js', scripts);
 	}
 
 	return file;
+};
 
+Generator.prototype.appendScriptsToFile = function appendScriptsToFile(fileName, replace) {
+	if(!fileName) throw "Must supply a fileName to \'appendScriptsToFile\' function.";
+	var file = this.readFileAsString(fileName);
+
+	var scripts = _.toArray(this.config.get("scripts"));
+
+	file = this.wireScriptBlockToFile(file, scripts, replace);
+
+	this.write(fileName, file);
 };
 
 
-        // <!-- build:js js/main.js -->
-        // <% _.each(scripts, function (script) { %><script src="<%= script %>"></script><% }); %>
-        // <!-- endbuild -->
