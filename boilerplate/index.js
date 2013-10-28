@@ -36,7 +36,9 @@ Generator.prototype.setDirectories = function setDirectories() {
 	};
 	// Set 'development' directories.
 	this.devDirectories = {
-		templates:      path.join(this.sourceRoot(), '../../templates')
+		templates:      path.join(this.sourceRoot(), '../../templates'),
+		relScripts:     "./js",
+		relVendor:      "./js/vendor"
 	};
 };
 
@@ -97,5 +99,7 @@ Generator.prototype.copyBoilerplateFiles = function copyBoilerplateFiles() {
 
 	this.copy(path.join(this.devDirectories.templates, 'boilerplate/public/css/main.css'), path.join(this.directories.styles, 'main.css'));
 	this.copy(path.join(this.devDirectories.templates, 'boilerplate/public/css/normalize.min.css'), path.join(this.directories.styles, 'normalize.min.css'));
+
+	this.copy(path.join(this.devDirectories.templates, 'boilerplate/test/test-main.js'), path.join(this.directories.test, 'test-main.js'));
 };
 
