@@ -11,6 +11,19 @@ var Generator = module.exports = function Generator(args, options, config) {
   GeneratorBase.apply(this, arguments);
 
   this.option("config-only");
+
+  this.hookFor('mean:main', {
+    args: args,
+    options: {
+      options: {
+        module: {
+          name: 'app',
+          dependencies: [],
+          path: path.join(this.directories.scripts, 'app')
+        }
+      }
+    }
+  });
 };
 
 util.inherits(Generator, GeneratorBase);
@@ -32,8 +45,11 @@ Generator.prototype.setPackageFiles = function setPackageFiles() {
   };
 
   packageConfig.devDependencies = {
+    "grunt-karma": "*",
     "karma": "*",
     "karma-mocha": "*",
+    "karma-jasmine": "*",
+    "karma-requirejs": "*",
     "mocha": "*",
     "chai": "*",
     "time-grunt": "*",
@@ -43,8 +59,7 @@ Generator.prototype.setPackageFiles = function setPackageFiles() {
     "grunt-contrib-jshint": "*",
     "grunt-nodemon": "*",
     "grunt-concurrent": "*",
-    "grunt-karma": "*",
-    "grunt-mocha-test": "*"
+    "grunt-bower-requirejs": "*"
   };
 
   this.setConfigFile('package.json', packageConfig);
@@ -57,17 +72,19 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
 
   bowerConfig.dependencies = {
     "jquery": "~1.9.1",
-    "angular": "~1.0.8",
+    "angular": "latest",
     "angular-route": "*",
     "angular-resource": "*",
     "angular-bootstrap": "*",
     "angular-ui-utils": "*"
   };
 
-  this.pushToConfig("scripts", "jquery", path.join("js/vendor/jquery/jquery.min.js"));
-  this.pushToConfig("scripts", "angular", path.join("js/vendor/angular/angular.min.js"));
-  this.pushToConfig("scripts", "angular-bootstrap", path.join("js/vendor/angular-bootstrap/ui-bootstrap.min.js"));
-  this.pushToConfig("scripts", "angular-route", path.join("js/vendor/angular-route/angular-route.min.js"));
+  bowerConfig.resolutions = {
+    "angular": "1.0.8"
+  };
+
+  this.pushToConfig("scripts", "jquery", path.join(this.devDirectories.relVendor, "/jquery/jquery.min.js"));
+  this.pushToConfig("scripts", "angular", path.join(this.devDirectories.relVendor, "/angular/angular.min.js"));
 
   _.each(this.components, function (component) {
     bowerConfig.dependencies[component] = "*";
@@ -83,8 +100,22 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
 Generator.prototype.setGeneralConfig = function setGeneralConfig() {
   this.setConfigFile(path.join(this.directories.config, 'config.js'), {
     PORT: 3000,
-    dir: this.directories
-  }, true);
+    dir: this.directories,
+    devDir: this.devDirectories
+  }, "module");
+};
+
+Generator.prototype.setRequirejsConfig = function setRequirejsConfig() {
+  if(this.components.indexOf('requirejs') === -1) return;
+  this.setConfigFile(path.join(this.directories.config, 'requirejs.config.js'), {
+    baseUrl: '../public/js',
+    paths: {
+      'angular': 'vendor/angular/angular'
+    },
+    shim: {
+      'angular' : {'exports' : 'angular'}
+    }
+  }, "requirejs");
 };
 
 Generator.prototype.copyGruntfile = function copyGruntfile() {
@@ -98,7 +129,12 @@ Generator.prototype.writeIndexFile = function writeIndexFile() {
   this.indexFile = this.readFileAsString(path.join(this.devDirectories.templates, 'boilerplate/public/index.html'));
   this.indexFile = this.engine(this.indexFile, this);
 
-  this.indexFile = this.writeScriptsToFile(this.indexFile);
+  this.pushToConfig("scripts", "app", path.join("./js/app.js"));
+  this.pushToConfig("scripts", "main", path.join("./js/main.js"));
+
+  var scripts = _.toArray(this.config.get("scripts"));
+
+  this.indexFile = this.wireScriptBlockToFile(this.indexFile, scripts);
 
   this.write(path.join(this.directories.public, 'index.html'), this.indexFile);
 };
