@@ -32,7 +32,7 @@ module.exports = function(grunt) {
                 }
             },
             karma: {
-                files: [config.dir.public + '/**/*.spec.js'],
+                files: ['**/*.spec.js'],
                 tasks: ['karma:unit:run']
             }
         },
@@ -59,7 +59,8 @@ module.exports = function(grunt) {
             ],
             test: [
                 config.dir.test + '/**/*.js', 
-                config.dir.app + '/**/*.spec.js'
+                config.dir.app + '/**/*.spec.js', 
+                config.dir.public + '/**/*.spec.js'
             ]
         },
 
@@ -91,20 +92,48 @@ module.exports = function(grunt) {
             unit: {
                 background: true,
                 options: {
+                    basePath: '',
+                    frameworks: ['jasmine', 'requirejs'],
+                    files: [
+                        {pattern: '**/*.spec.js', included: false},
+                        {pattern: 'public/js/*.js', included: false},
+                        {pattern: 'public/js/**/*.js', included: false},
+                        {pattern: 'public/js/**/*.spec.js', included: false},
+                        {pattern: 'test/spec/*.js', included: false},
+
+                        'test/test-main.js'
+
+                    ],
+                    exclude: [
+                        'public/js/main.js',
+                        'public/js/vendor/**/*'
+                    ],
+                    colors: true,
                     captureTimeout: 60000,
                     runnerPort: 9000,
                     browsers: ['Chrome']
                 }
             }
+        },
+
+        bower: {
+            target: {
+                rjsConfig: config.dir.config + "/requirejs.config.js"
+            }
         }
     });
 
-    //Making grunt default to force in order not to break the project.
     grunt.option('force', true);
 
-    //Default task(s).
+    //Default task.
     grunt.registerTask('default', ['jshint', 'concurrent']);
 
     //Test task.
     grunt.registerTask('test', ['jshint', 'karma:unit:start', 'watch']);
+
+    //Build task.
+    grunt.registerTask('build', [
+        'jshint',
+        'bower'
+    ]);
 };
