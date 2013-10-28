@@ -5,7 +5,7 @@ define(function (require) {
 	<% dependencies.forEach(function (dependency) { %>
 	var <%= dependency %> = require('<%= dependency %>');<% }); %>
 
-	<%= output %>
+	var <%= name %> = <%= output %>
 
 	return <%= name %>;
 });
