@@ -55,10 +55,6 @@ Generator.prototype.askFor = function askFor() {
       name: 'RequireJS Support',
       value: 'requirejs',
       checked: true
-    }, {
-      name: 'Twitter Bootstrap',
-      value: 'bootstrap',
-      checked: true
     }]
   }];
 
