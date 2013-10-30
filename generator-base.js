@@ -125,7 +125,7 @@ Generator.prototype.writeModule = function writeModule(path, module, template) {
 	this.validateModule(module);
 
 	var output = this.parseTemplate(template, module, function (output, data) {
-		if(this.components.indexOf('requirejs') == -1) return;
+		if(this.components.indexOf('requirejs') == -1) return output;
 
 		var input = data;
 		input.module = output;
