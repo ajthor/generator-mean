@@ -109,7 +109,7 @@ Generator.prototype.copyGruntfile = function copyGruntfile() {
 
 Generator.prototype.makeAppModule = function makeAppModule() {
   if(this.options['config-only']===true) return;
-  this.buildModule('common/app.js', {name: 'app'});
+  this.buildModule('common/app.js', {name: 'app', specDependencies: ['app']});
 };
 
 Generator.prototype.makeMainModule = function makeMainModule() {

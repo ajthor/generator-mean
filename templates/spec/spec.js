@@ -1,14 +1,17 @@
-	describe('<%= name %>', function () {
+<% specDependencies.forEach(function (dependency) { %>
+var <%= dependency %> = require('<%= dependency %>');<% }); %>
 
-		// Create some test.
-		var module;
+describe('<%= name %>', function () {
 
-		beforeEach(function() {
-			module = angular.module("app");
-		});
+	// Create some test.
+	var module;
 
-		it("should be registered", function() {
-			expect(module).not.toBe(null);
-		});
-		
+	beforeEach(function() {
+		module = angular.module("app");
 	});
+
+	it("should be registered", function() {
+		expect(module).not.toBe(null);
+	});
+	
+});
