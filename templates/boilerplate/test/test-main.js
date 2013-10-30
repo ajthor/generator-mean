@@ -9,10 +9,10 @@ for (var file in window.__karma__.files) {
 
 requirejs.config({
     
-    baseUrl: '../public/js',
+    baseUrl: 'base/public/js',
 
     paths: {
-        'angular': 'vendor/angular/angular'
+        'angular': 'vendor/angular/angular.min'
     },
 
     shim: {

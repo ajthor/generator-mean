@@ -13,6 +13,6 @@ require(function (require) {
 
 	angular.element().ready(function() {
 		$html.addClass('data-ng-app');
-		angular.bootstrap($html, [app['app']]);
+		angular.bootstrap($html, [app.app]);
 	});
 });

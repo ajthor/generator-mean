@@ -93,8 +93,9 @@ module.exports = function(grunt) {
                 background: true,
                 options: {
                     basePath: '',
-                    frameworks: ['jasmine', 'requirejs'],
+                    frameworks: ['jasmine'<% if(components.indexOf('requirejs') !== -1) { %>, 'requirejs'<% } %>],
                     files: [
+                        <% if(components.indexOf('requirejs') !== -1) { %>
                         {pattern: '**/*.spec.js', included: false},
                         {pattern: 'public/js/*.js', included: false},
                         {pattern: 'public/js/**/*.js', included: false},
@@ -102,15 +103,21 @@ module.exports = function(grunt) {
                         {pattern: 'test/spec/*.js', included: false},
 
                         'test/test-main.js'
-
+                        <% } else { %>
+                        'public/js/vendor/jquery/jquery.js',
+                        'public/js/vendor/angular/angular.js',
+                        'public/js/vendor/bootstrap/**/*.js',
+                        '**/*.spec.js',
+                        'public/js/**/*.js'
+                        <% } %>
                     ],
                     exclude: [
-                        'public/js/main.js',
-                        'public/js/vendor/**/*'
+                        <% if(components.indexOf('requirejs') !== -1) { %>'public/js/main.js'<% } %>
                     ],
                     colors: true,
                     captureTimeout: 60000,
                     runnerPort: 9000,
+                    logLevel: config.LOG_INFO,
                     browsers: ['Chrome']
                 }
             }
@@ -137,3 +144,5 @@ module.exports = function(grunt) {
         'bower'
     ]);
 };
+
+

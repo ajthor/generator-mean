@@ -20,7 +20,7 @@ Generator.prototype.askFor = function askFor() {
 };
 
 Generator.prototype.makeModule = function makeModule() {
-	this.module.type = 'module';
-	this.buildModule('javascript/module.js', this.module);
+	this.module.type = 'service';
+	this.buildModule('javascript/service.js', this.module);
 	this.appendScriptsToFile(path.join(this.directories.public, 'index.html'), true);
 };
