@@ -3,6 +3,6 @@ angular.module('<%= name %>', [
 		<% }}; %>
 		])
 
-		.config(function ($routeProvider) {
-			$routeProvider.otherwise({redirectTo: '/'});
-		});
+		.run(function ($rootScope) {
+			$rootScope.message = "Hello, World!";
+		})
