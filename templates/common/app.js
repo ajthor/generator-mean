@@ -5,4 +5,4 @@ angular.module('<%= name %>', [
 
 		.run(function ($rootScope) {
 			$rootScope.message = "Hello, World!";
-		})
+		});
