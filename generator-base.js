@@ -219,9 +219,10 @@ Generator.prototype.createModule = function createModule(values) {
 	if(_.isString(module.dependencies)) 
 		module.dependencies = _.compact(module.dependencies.split(" "));
 
+	var relPath = path.join(this.devDirectories.relScripts, module.path, module.name);
 	module.path = path.join(this.directories.scripts, module.path, module.name);
 
-	this.pushToConfig("scripts", module.name, module.path + '.js');
+	this.pushToConfig("scripts", module.name, relPath + '.js');
 
 
 	this.validateModule(module);
