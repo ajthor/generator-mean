@@ -47,6 +47,7 @@ Generator.prototype.getConfigFile = function getConfigFile(fileName) {
 		return (file=='undefined') ? file : {};
 	}.bind(this))(fileName);
 };
+
 Generator.prototype.setConfigFile = function setConfigFile(dest, obj, template) {
 	if(!dest || !obj) throw "ERR: Must supply non-falsey arguments to \'setConfigFile\' function.";
 	var output, parsed = JSON.stringify(obj);
@@ -59,7 +60,9 @@ Generator.prototype.setConfigFile = function setConfigFile(dest, obj, template) 
 	
 	this.write(dest, output);
 };
+
 Generator.prototype.showConfig = function showConfig(name) {console.log(this.config.get(name));};
+
 Generator.prototype.pushToConfig = function pushToConfig(name, key, value, force) {
 	if(!name || !value || !key) throw "ERR: Must supply non-falsey arguments to \'pushToConfig\' function."
 		+ "\nname: " + name
@@ -140,18 +143,39 @@ Generator.prototype.writeModule = function writeModule(path, module, template) {
 };
 
 //
-// Functions for dealing with Usemin blocks.
+// Functions for dealing with script blocks.
 //
+
+Generator.prototype.appendBlock = function appendBlock(string, block, index) {
+	if(!string || !block) throw "Must supply a string and block to \'appendBlock\' function.";
+	if(!index) index = string.length;
+	if (index > 0)
+		return string.substring(0, index) + block + string.substring(index, string.length);
+	else
+		return string + block;
+};
+Generator.prototype.getBlock = function getBlock(string, begin, end) {
+	if(!string || !begin || !end) throw "Must supply a string, a beginning, and end to \'getBlock\' function.";
+	begin = string.indexOf(begin)-1;
+	end = string.indexOf(end, begin)+end.length;
+	return string.slice(begin, end);
+};
+
+Generator.prototype.removeBlock = function removeBlock(string, begin, end) {
+	if(!string || !begin || !end) throw "Must supply a string, a beginning, and end to \'removeBlock\' function.";
+	var block = string.slice(begin, end);
+	return string.replace(block, "");
+};
 
 Generator.prototype.getUseminBlock = function getUseminBlock(file, match) {
 	if(!match) match = '<!-- build:js js/main.js -->';
-	var start = file.lastIndexOf("\n", file.indexOf(match)) - 1;
-	var finish = file.indexOf('<!-- endbuild -->', start) + 17;
-	return file.slice(start, finish);
+	var begin = file.lastIndexOf("\n", file.indexOf(match)) - 1;
+	var end = file.indexOf('<!-- endbuild -->', begin) + 17;
+	return file.slice(begin, end);
 };
 Generator.prototype.removeUseminBlock = function removeUseminBlock(file, match) {
-	var oldBlock = this.getUseminBlock(file, match);
-	return file.replace(oldBlock, "");
+	var block = this.getUseminBlock(file, match);
+	return file.replace(block, "");
 };
 
 //
