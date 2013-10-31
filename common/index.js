@@ -15,41 +15,6 @@ var Generator = module.exports = function Generator(args, options, config) {
 
 util.inherits(Generator, GeneratorBase);
 
-Generator.prototype.setPackageFiles = function setPackageFiles() {
-  var packageConfig = JSON.parse(this.readFileAsString(path.join(this.devDirectories.templates, 'common/_package.json')));
-
-  packageConfig.dependencies = {
-    "express": "*",
-    "jade": "*",
-    "mongoose": "*",
-    "bower": "*",
-    "grunt": "*",
-    "grunt-cli": "*",
-    "async": "*",
-    "lodash": "*"
-  };
-
-  packageConfig.devDependencies = {
-    "grunt-karma": "*",
-    "karma": "*",
-    "karma-mocha": "*",
-    "karma-jasmine": "*",
-    "karma-requirejs": "*",
-    "mocha": "*",
-    "chai": "*",
-    "time-grunt": "*",
-    "load-grunt-tasks": "*",
-    "grunt-contrib-watch": "*",
-    "grunt-contrib-clean": "*",
-    "grunt-contrib-jshint": "*",
-    "grunt-nodemon": "*",
-    "grunt-concurrent": "*",
-    "grunt-bower-requirejs": "*"
-  };
-
-  this.setConfigFile('package.json', packageConfig);
-};
-
 Generator.prototype.setBowerFiles = function setBowerFiles() {
   var bowerConfig = JSON.parse(this.readFileAsString(path.join(this.devDirectories.templates, 'common/_bower.json')));
 
@@ -78,6 +43,38 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
   });
 
   this.setConfigFile('bower.json', bowerConfig);
+};
+
+Generator.prototype.setPackageFiles = function setPackageFiles() {
+  var packageConfig = JSON.parse(this.readFileAsString(path.join(this.devDirectories.templates, 'common/_package.json')));
+
+  packageConfig.dependencies = {
+    "express": "*",
+    "jade": "*",
+    "mongoose": "*",
+    "bower": "*",
+    "grunt": "*",
+    "grunt-cli": "*",
+    "async": "*",
+    "lodash": "*"
+  };
+
+  packageConfig.devDependencies = {
+    "grunt-karma": "*",
+    "karma": "*",
+    "karma-jasmine": "*",
+    "karma-requirejs": "*",
+    "time-grunt": "*",
+    "load-grunt-tasks": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-nodemon": "*",
+    "grunt-concurrent": "*",
+    "grunt-bower-requirejs": "*"
+  };
+
+  this.setConfigFile('package.json', packageConfig);
 };
 
 Generator.prototype.setGeneralConfig = function setGeneralConfig() {
