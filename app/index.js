@@ -10,8 +10,6 @@ var _ = require('lodash');
 var Generator = module.exports = function Generator(args, options, config) {
   GeneratorBase.apply(this, arguments);
 
-  this.option("dont-ask");
-
   this.hookFor('mean:boilerplate', {
     args: args,
     options: {

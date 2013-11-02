@@ -7,11 +7,13 @@ var _ = require('lodash');
 
 var Generator = module.exports = function Generator() {
 	GeneratorBase.apply(this, arguments);
+	if(this.options["remove"]) this.removeFromConfig("scripts", this.name, false);
 };
 
 util.inherits(Generator, GeneratorBase);
 
 Generator.prototype.askFor = function askFor() {
+	if(this.options["remove"]) return;
 	var done = this.async();
 	this.promptForModuleValues([], function (r) {
 		this.module = r;
@@ -20,7 +22,8 @@ Generator.prototype.askFor = function askFor() {
 };
 
 Generator.prototype.makeModule = function makeModule() {
+	if(this.options["remove"]) return;
 	this.module.type = 'route';
 	this.buildModule('javascript/route.js', this.module);
-	this.appendScriptsToFile(path.join(this.directories.public, 'index.html'), true);
+	this.appendScriptsToFile(path.join(this.directories.public, 'index.html'), this.module.path);
 };

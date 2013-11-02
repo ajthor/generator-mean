@@ -10,7 +10,6 @@ var _ = require('lodash');
 var Generator = module.exports = function Generator(args, options, config) {
   GeneratorBase.apply(this, arguments);
 
-  this.option("config-only");
 };
 
 util.inherits(Generator, GeneratorBase);
@@ -20,7 +19,7 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
 
   bowerConfig.dependencies = {
     "jquery": "~1.9.1",
-    "angular": "latest",
+    "angular": ">=1",
     "angular-route": "*",
     "angular-bootstrap": "*",
     "angular-resource": "*",
@@ -31,8 +30,8 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
     "angular": "1.2.0-rc.3"
   };
 
-  this.pushToConfig("scripts", "jquery", path.join(this.devDirectories.relVendor, "/jquery/jquery.js"));
-  this.pushToConfig("scripts", "angular", path.join(this.devDirectories.relVendor, "/angular/angular.js"));
+  this.pushToConfig("scripts", "jquery", path.join(this.directories.vendor, "/jquery/jquery.js"));
+  this.pushToConfig("scripts", "angular", path.join(this.directories.vendor, "/angular/angular.js"));
 
   _.each(this.components, function (component) {
     bowerConfig.dependencies[component] = "*";

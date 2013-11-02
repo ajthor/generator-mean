@@ -10,7 +10,13 @@ var Generator = module.exports = function Generator() {
 	yeoman.generators.Base.apply(this, arguments);
 
 	this.argument('name', { type: String, required: false });
+
 	this.option("dont-ask");
+	this.option("reset-scripts");
+	this.option("remove");
+	this.option("config-only");
+
+	if(this.options["reset-scripts"]) this.config.set("scripts", {});
 	// Set these values as attributes of generators. 
 	// These will be available to all generators that inherit this one.
 	this.components = this.config.get('components');
@@ -79,6 +85,24 @@ Generator.prototype.pushToConfig = function pushToConfig(name, key, value, force
 		return config;
 
 	}.bind(this))(name, key, value, force);
+};
+Generator.prototype.removeFromConfig = function removeFromConfig(name, key, force) {
+	if(!name || !key) throw "ERR: Must supply non-falsey arguments to \'removeFromConfig\' function."
+		+ "\nname: " + name
+		+ "\nkey: " + key;
+	return (function (name, key, force) {
+
+		var config = this.config.get(name) || null;
+		if(config && config[key]) delete config[key];
+
+		console.log(key + " removed from \"scripts\" configuration.");
+
+		this.config.set(name, config);
+		if(force) this.config.forceSave();
+
+		return config;
+
+	}.bind(this))(name, key, force);
 };
 
 //
@@ -150,9 +174,9 @@ Generator.prototype.appendBlock = function appendBlock(string, block, index) {
 	if(!string || !block) throw "Must supply a string and block to \'appendBlock\' function.";
 	if(!index) index = string.length;
 	if (index > 0)
-		return string.substring(0, index) + block + string.substring(index, string.length);
+		return (string.substring(0, index) + block + string.substring(index, string.length));
 	else
-		return string + block;
+		return (string + block);
 };
 Generator.prototype.getBlock = function getBlock(string, begin, end) {
 	if(!string || !begin || !end) throw "Must supply a string, a beginning, and end to \'getBlock\' function.";
@@ -176,6 +200,11 @@ Generator.prototype.getUseminBlock = function getUseminBlock(file, match) {
 Generator.prototype.removeUseminBlock = function removeUseminBlock(file, match) {
 	var block = this.getUseminBlock(file, match);
 	return file.replace(block, "");
+};
+Generator.prototype.removeUseminScripts = function removeUseminScripts(file, match) {
+	var begin = file.lastIndexOf('<!-- build:js js/main.js -->') + 28;
+	var end = file.indexOf('<!-- endbuild -->', begin);
+	return file.replace(file.slice(begin, end), "\n\t\t");
 };
 
 //
@@ -219,11 +248,10 @@ Generator.prototype.createModule = function createModule(values) {
 	if(_.isString(module.dependencies)) 
 		module.dependencies = _.compact(module.dependencies.split(" "));
 
-	var relPath = path.join(this.devDirectories.relScripts, module.path, module.name);
-	module.path = path.join(this.directories.scripts, module.path, module.name);
 
-	this.pushToConfig("scripts", module.name, relPath + '.js');
+	this.pushToConfig("scripts", module.name, path.join(this.directories.scripts, module.path, module.name) + '.js');
 
+	module.path = path.join(this.directories.scripts, module.path, module.name) + '.js';
 
 	this.validateModule(module);
 	// Return new module.
@@ -252,25 +280,37 @@ Generator.prototype.validateModule = function validateModule(module) {
 // Functions for writing scripts to files.
 //
 
-Generator.prototype.wireScriptBlockToFile = function wireScriptBlockToFile(file, scripts, remove) {
+Generator.prototype.wireScriptBlockToFile = function wireScriptBlockToFile(file, scripts) {
+	var i, index;
+	if(!scripts) scripts = this.config.get("scripts");
+	// Cast to an array.
+	if(_.isObject(scripts)) scripts = _.toArray(scripts);
+	else if(!_.isArray(scripts)) scripts = [scripts];
+	// Make scripts relative to the index file directory.
+	for(i in scripts) {
+		scripts[i] = path.relative(this.directories.public, scripts[i]);
+	}
 	
-	if(remove===true) file = this.removeUseminBlock(file);
+	if(scripts.length!==1) file = this.removeUseminScripts(file);
 
 	if(this.components.indexOf('requirejs') !== -1) {
-		file = this.appendScripts(file, 'js/main.js', [path.join(this.devDirectories.relVendor, 'requirejs/require.js')], {'data-main': path.join(this.devDirectories.relScripts, 'main')});
+		index = file.lastIndexOf("\n", file.indexOf('<!-- endbuild -->', file.indexOf('<!-- build:js js/main.js -->')));
+		file = this.appendBlock(file, "\n\t\t<script data-main=\""+path.join(this.devDirectories.relScripts, 'main')+"\" src=\""+path.join(this.devDirectories.relVendor, 'requirejs/require.js')+"\"></script>\n", index);
 	} else {
-		file = this.appendScripts(file, 'js/main.js', scripts);
+		_.each(scripts, function (script) {
+			index = file.lastIndexOf("\n", file.indexOf('<!-- endbuild -->', file.indexOf('<!-- build:js js/main.js -->')));
+			file = this.appendBlock(file, "\n\t\t<script src=\"" + script + "\"></script>", index);
+		}, this);
 	}
 
 	return file;
 };
 
-Generator.prototype.appendScriptsToFile = function appendScriptsToFile(fileName, remove) {
+Generator.prototype.appendScriptsToFile = function appendScriptsToFile(fileName, scripts) {
 	if(!fileName) throw "Must supply a fileName to \'appendScriptsToFile\' function.";
 	var file = this.readFileAsString(fileName);
-	var scripts = _.toArray(this.config.get("scripts"));
 
-	file = this.wireScriptBlockToFile(file, scripts, remove);
+	file = this.wireScriptBlockToFile(file, scripts);
 
 	this.write(fileName, file);
 };
