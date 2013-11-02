@@ -12,6 +12,7 @@ var Generator = module.exports = function Generator() {
 	this.argument('name', { type: String, required: false });
 
 	this.option("dont-ask");
+	this.option("skip-add");
 	this.option("reset-scripts");
 	this.option("remove");
 	this.option("config-only");
@@ -250,8 +251,8 @@ Generator.prototype.createModule = function createModule(values) {
 	if(_.isString(module.dependencies)) 
 		module.dependencies = _.compact(module.dependencies.split(" "));
 
-
-	this.pushToConfig("scripts", module.name, path.join(this.directories.scripts, module.path, module.name) + '.js');
+	if(!this.options["skip-add"])
+		this.pushToConfig("scripts", module.name, path.join(this.directories.scripts, module.path, module.name) + '.js');
 
 	module.path = path.join(this.directories.scripts, module.path, module.name) + '.js';
 
@@ -309,6 +310,7 @@ Generator.prototype.wireScriptBlockToFile = function wireScriptBlockToFile(file,
 };
 
 Generator.prototype.appendScriptsToFile = function appendScriptsToFile(fileName, scripts) {
+	if(this.options["skip-add"]) return;
 	if(!fileName) throw "Must supply a fileName to \'appendScriptsToFile\' function.";
 	var file = this.readFileAsString(fileName);
 
