@@ -16,7 +16,9 @@ var Generator = module.exports = function Generator() {
 	this.option("remove");
 	this.option("config-only");
 
-	if(this.options["reset-scripts"]) this.config.set("scripts", {});
+	if(this.options["reset-scripts"]) {
+		this.appendScriptsToFile(path.join(this.directories.public, 'index.html'));
+	}
 	// Set these values as attributes of generators. 
 	// These will be available to all generators that inherit this one.
 	this.components = this.config.get('components');
