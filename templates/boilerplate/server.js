@@ -14,6 +14,7 @@ var app = module.exports = express();
  * Configuration
  */
 
+var mongoose = require('mongoose');
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + config.dir.views);
