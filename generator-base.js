@@ -3,6 +3,7 @@ var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
 
+var cheerio = require('cheerio');
 var _ = require('lodash');
 var async = require('async');
 
@@ -170,47 +171,6 @@ Generator.prototype.writeModule = function writeModule(path, module, template) {
 };
 
 //
-// Functions for dealing with script blocks.
-//
-
-Generator.prototype.appendBlock = function appendBlock(string, block, index) {
-	if(!string || !block) throw "Must supply a string and block to \'appendBlock\' function.";
-	if(!index) index = string.length;
-	if (index > 0)
-		return (string.substring(0, index) + block + string.substring(index, string.length));
-	else
-		return (string + block);
-};
-Generator.prototype.getBlock = function getBlock(string, begin, end) {
-	if(!string || !begin || !end) throw "Must supply a string, a beginning, and end to \'getBlock\' function.";
-	begin = string.indexOf(begin)-1;
-	end = string.indexOf(end, begin)+end.length;
-	return string.slice(begin, end);
-};
-
-Generator.prototype.removeBlock = function removeBlock(string, begin, end) {
-	if(!string || !begin || !end) throw "Must supply a string, a beginning, and end to \'removeBlock\' function.";
-	var block = string.slice(begin, end);
-	return string.replace(block, "");
-};
-
-Generator.prototype.getUseminBlock = function getUseminBlock(file, match) {
-	if(!match) match = '<!-- build:js js/main.js -->';
-	var begin = file.lastIndexOf("\n", file.indexOf(match)) - 1;
-	var end = file.indexOf('<!-- endbuild -->', begin) + 17;
-	return file.slice(begin, end);
-};
-Generator.prototype.removeUseminBlock = function removeUseminBlock(file, match) {
-	var block = this.getUseminBlock(file, match);
-	return file.replace(block, "");
-};
-Generator.prototype.removeUseminScripts = function removeUseminScripts(file, match) {
-	var begin = file.lastIndexOf('<!-- build:js js/main.js -->') + 28;
-	var end = file.indexOf('<!-- endbuild -->', begin);
-	return file.replace(file.slice(begin, end), "\n\t\t");
-};
-
-//
 // Functions for creating modules.
 // 
 
@@ -254,7 +214,7 @@ Generator.prototype.createModule = function createModule(values) {
 	if(!this.options["skip-add"])
 		this.pushToConfig("scripts", module.name, path.join(this.directories.scripts, module.path, module.name) + '.js');
 
-	module.path = path.join(this.directories.scripts, module.path, module.name) + '.js';
+	module.path = path.join(this.directories.scripts, module.path, module.name);
 
 	this.validateModule(module);
 	// Return new module.
@@ -280,10 +240,21 @@ Generator.prototype.validateModule = function validateModule(module) {
 };
 
 //
+// Functions for dealing with script blocks.
+//
+
+Generator.prototype.removeScriptTag = function removeScriptTag(file, scripts) {
+	var $file = cheerio.load(file);
+	$file('script', 'body').remove();
+	file = $file.html();
+	return file;
+};
+
+//
 // Functions for writing scripts to files.
 //
 
-Generator.prototype.wireScriptBlockToFile = function wireScriptBlockToFile(file, scripts) {
+Generator.prototype.wireScriptsToFile = function wireScriptsToFile(file, scripts) {
 	var i, index;
 	if(!scripts) scripts = this.config.get("scripts");
 	// Cast to an array.
@@ -294,18 +265,24 @@ Generator.prototype.wireScriptBlockToFile = function wireScriptBlockToFile(file,
 		scripts[i] = path.relative(this.directories.public, scripts[i]);
 	}
 	
-	if(scripts.length!==1) file = this.removeUseminScripts(file);
+	if(scripts.length!==1) file = this.removeScriptTag(file, scripts);
+
+	// Load file into object for dom manipulation.
+	var $file = cheerio.load(file);
 
 	if(this.components.indexOf('requirejs') !== -1) {
-		index = file.lastIndexOf("\n", file.indexOf('<!-- endbuild -->', file.indexOf('<!-- build:js js/main.js -->')));
-		file = this.appendBlock(file, "\n\t\t<script data-main=\""+path.join(this.devDirectories.relScripts, 'main')+"\" src=\""+path.join(this.devDirectories.relVendor, 'requirejs/require.js')+"\"></script>\n", index);
+		$file('body').append("<script data-main=\"" + path.join(this.devDirectories.relScripts, 'main') + '" src="' + path.join(this.devDirectories.relVendor, 'requirejs/require.js') + "\"></script>");
 	} else {
 		_.each(scripts, function (script) {
-			index = file.lastIndexOf("\n", file.indexOf('<!-- endbuild -->', file.indexOf('<!-- build:js js/main.js -->')));
-			file = this.appendBlock(file, "\n\t\t<script src=\"" + script + "\"></script>", index);
+			$file('body').append("<script src=\"" + script + "\"></script>");
 		}, this);
 	}
 
+	$file('body').attr('ng-app', 'app');
+
+	// Convert back to string.
+	file = $file.html();
+	// Return string.
 	return file;
 };
 
@@ -314,7 +291,7 @@ Generator.prototype.appendScriptsToFile = function appendScriptsToFile(fileName,
 	if(!fileName) throw "Must supply a fileName to \'appendScriptsToFile\' function.";
 	var file = this.readFileAsString(fileName);
 
-	file = this.wireScriptBlockToFile(file, scripts);
+	file = this.wireScriptsToFile(file, scripts);
 
 	this.write(fileName, file);
 };

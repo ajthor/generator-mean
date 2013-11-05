@@ -5,6 +5,7 @@ var yeoman = require('yeoman-generator');
 
 var GeneratorBase = require('../generator-base.js');
 
+var cheerio = require('cheerio');
 var _ = require('lodash');
 
 var Generator = module.exports = function Generator(args, options, config) {
@@ -68,6 +69,9 @@ Generator.prototype.setPackageFiles = function setPackageFiles() {
     "grunt-contrib-watch": "*",
     "grunt-contrib-clean": "*",
     "grunt-contrib-jshint": "*",
+    "grunt-contrib-requirejs": "*",
+    "grunt-usemin": "*",
+    "grunt-autoprefixer": "*",
     "grunt-nodemon": "*",
     "grunt-concurrent": "*",
     "grunt-bower-requirejs": "*"
@@ -129,7 +133,7 @@ Generator.prototype.writeIndexFile = function writeIndexFile() {
 
   var scripts = _.toArray(this.config.get("scripts"));
 
-  this.indexFile = this.wireScriptBlockToFile(this.indexFile, scripts);
+  this.indexFile = this.wireScriptsToFile(this.indexFile, scripts);
 
   this.write(path.join(this.directories.public, 'index.html'), this.indexFile);
 };

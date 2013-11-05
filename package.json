@@ -37,7 +37,8 @@
     "karma-phantomjs-launcher": "~0.1.0",
     "karma": "~0.10.2",
     "karma-mocha": "~0.1.0",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "cheerio": "~0.12.3"
   },
   "peerDependencies": {
     "yo": ">=1.0.0-rc.1.1"

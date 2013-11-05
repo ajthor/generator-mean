@@ -12,7 +12,7 @@ require(['angular', 'app'], function (angular, app) {
 	'use strict';
 
 	angular.element(document).ready(function() {
-		angular.bootstrap(angular.element(document).find('body'), ['app']);
+		angular.bootstrap(document, ['app']);
 	});
 
 });
