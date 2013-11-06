@@ -70,7 +70,8 @@ Generator.prototype.setPackageFiles = function setPackageFiles() {
     "grunt-contrib-clean": "*",
     "grunt-contrib-jshint": "*",
     "grunt-contrib-requirejs": "*",
-    "grunt-usemin": "*",
+    "grunt-contrib-htmlmin": "*",
+    "grunt-contrib-cssmin": "*",
     "grunt-autoprefixer": "*",
     "grunt-nodemon": "*",
     "grunt-concurrent": "*",
@@ -84,26 +85,12 @@ Generator.prototype.setGeneralConfig = function setGeneralConfig() {
   this.setConfigFile(path.join(this.directories.config, 'config.js'), {
     PORT: 3000,
     dir: this.directories,
-    devDir: this.devDirectories
+    devDir: this.devDirectories,
+    components: this.components
   }, "module");
 };
 
-Generator.prototype.setRequirejsConfig = function setRequirejsConfig() {
-  if(this.components.indexOf('requirejs') === -1) return;
-
-  this.setConfigFile(path.join(this.directories.config, 'requirejs.config.js'), {
-    baseUrl: '../public/js',
-    paths: {
-      'angular': 'vendor/angular/angular'
-    },
-    shim: {
-      'angular' : {'exports' : 'angular'}
-    }
-  }, "require");
-};
-
 Generator.prototype.copyGruntfile = function copyGruntfile() {
-
   this.template(path.join(this.devDirectories.templates, 'common/Gruntfile.js'), 'Gruntfile.js');
 };
 

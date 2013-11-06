@@ -1,18 +1,22 @@
-'use strict';
-
 var config = require('./config/config.js');
 
     //
     //
     //
 
-module.exports = function(grunt) {  
+module.exports = function(grunt) {
+    'use strict';
     // show elapsed time at the end
     require('time-grunt')(grunt);
     // load all grunt tasks
     require('load-grunt-tasks')(grunt);
     // Project Configuration
     grunt.initConfig({
+
+        //
+        // Development
+        //
+
         watch: {
             js: {
                 files: [
@@ -33,7 +37,10 @@ module.exports = function(grunt) {
             },
             karma: {
                 files: ['**/*.spec.js'],
-                tasks: ['karma:unit:run']
+                tasks: ['karma:unit:run'],
+                options: {
+                    livereload: true
+                }
             }
         },
 
@@ -77,7 +84,7 @@ module.exports = function(grunt) {
                     env: {
                         PORT: 3000
                     },
-                    cwd: __dirname
+                    cwd: "./"
                 }
             }
         },
@@ -87,6 +94,10 @@ module.exports = function(grunt) {
                 logConcurrentOutput: true
             }
         },
+
+        //
+        // Testing
+        //
 
         karma: {
             unit: {
@@ -123,9 +134,84 @@ module.exports = function(grunt) {
             }
         },
 
+        //
+        // Build
+        //
+
+        clean: {
+            build: {
+                files: [{
+                    dot: true,
+                    src: [config.dir.build]
+                }]
+            }
+        },
+
+        autoprefixer: {
+            styles: {
+                expand: true,
+                flatten: true,
+                src: config.dir.styles + '/*.css',
+                dest: config.dir.build + '/css/'
+            }
+        },
+
+        // useminPrepare: {
+        //     html: config.dir.public + '/index.html',
+        //     options: {
+        //         dest: config.dir.build
+        //     }
+        // },
+        // usemin: {
+        //     html: [config.dir.build + '/{,*/}*.html'],
+        //     css: [config.dir.build + '/css/{,*/}*.css'],
+        //     options: {
+        //         dirs: [config.dir.build]
+        //     }
+        // },
+
+        requirejs: {
+            build: {
+                options: {
+                    mainConfigFile: config.dir.scripts + '/main.js',
+
+                    name: 'main',
+                    out: config.dir.build + '/js/main.js',
+
+                    optimize: 'none',
+                    optimizeCss: "standard.keepLines",
+
+                    preserveLicenseComments: false,
+                    useStrict: true,
+                    wrap: true
+                }
+            }
+        },
+
         bower: {
             target: {
-                rjsConfig: config.dir.config + "/requirejs.config.js"
+                rjsConfig: config.dir.scripts + "/main.js"
+            }
+        },
+
+        htmlmin: {
+            build: {
+                options: {
+                    removeComments: true,
+                    collapseWhitespace: true
+                },
+                files: {
+                    'build/index.html': config.dir.public + '/index.html'
+                }
+            }
+        },
+        cssmin: {
+            build: {
+                expand: true,
+                cwd: config.dir.build + '/css/',
+                src: ['*.css', '!*.min.css'],
+                dest: config.dir.build + '/css/',
+                ext: '.css'
             }
         }
     });
@@ -133,16 +219,25 @@ module.exports = function(grunt) {
     grunt.option('force', true);
 
     //Default task.
-    grunt.registerTask('default', ['jshint', 'concurrent']);
+    grunt.registerTask('preview', ['jshint', 'concurrent']);
 
     //Test task.
     grunt.registerTask('test', ['jshint', 'karma:unit:start', 'watch']);
 
     //Build task.
-    grunt.registerTask('build', [
-        'jshint',
-        'bower'
-    ]);
+    grunt.registerTask('default', function() {
+        grunt.task.run([
+            'clean',
+            'jshint',
+            'autoprefixer',
+            'cssmin',
+            'htmlmin'
+        ]);
+
+        if(this.components.indexOf('requirejs') !== -1) {
+            grunt.task.run(['bower', 'requirejs']);
+        }
+    });
 };
 
 
