@@ -104,26 +104,16 @@ module.exports = function(grunt) {
                 background: true,
                 options: {
                     basePath: '',
-                    frameworks: ['jasmine'<% if(components.indexOf('requirejs') !== -1) { %>, 'requirejs'<% } %>],
+                    frameworks: ['jasmine'],
                     files: [
-                        <% if(components.indexOf('requirejs') !== -1) { %>
-                        {pattern: '**/*.spec.js', included: false},
-                        {pattern: 'public/js/*.js', included: false},
-                        {pattern: 'public/js/**/*.js', included: false},
-                        {pattern: 'public/js/**/*.spec.js', included: false},
-                        {pattern: 'test/spec/*.js', included: false},
-
-                        'test/test-main.js'
-                        <% } else { %>
                         'public/js/vendor/jquery/jquery.js',
                         'public/js/vendor/angular/angular.js',
                         'public/js/vendor/bootstrap/**/*.js',
                         '**/*.spec.js',
                         'public/js/**/*.js'
-                        <% } %>
                     ],
                     exclude: [
-                        <% if(components.indexOf('requirejs') !== -1) { %>'public/js/main.js'<% } %>
+                        
                     ],
                     colors: true,
                     captureTimeout: 60000,
@@ -156,41 +146,17 @@ module.exports = function(grunt) {
             }
         },
 
-        // useminPrepare: {
-        //     html: config.dir.public + '/index.html',
-        //     options: {
-        //         dest: config.dir.build
-        //     }
-        // },
-        // usemin: {
-        //     html: [config.dir.build + '/{,*/}*.html'],
-        //     css: [config.dir.build + '/css/{,*/}*.css'],
-        //     options: {
-        //         dirs: [config.dir.build]
-        //     }
-        // },
-
-        requirejs: {
-            build: {
-                options: {
-                    mainConfigFile: config.dir.scripts + '/main.js',
-
-                    name: 'main',
-                    out: config.dir.build + '/js/main.js',
-
-                    optimize: 'none',
-                    optimizeCss: "standard.keepLines",
-
-                    preserveLicenseComments: false,
-                    useStrict: true,
-                    wrap: true
-                }
+        useminPrepare: {
+            html: config.dir.public + '/index.html',
+            options: {
+                dest: config.dir.build
             }
         },
-
-        bower: {
-            target: {
-                rjsConfig: config.dir.scripts + "/main.js"
+        usemin: {
+            html: [config.dir.build + '/{,*/}*.html'],
+            css: [config.dir.build + '/css/{,*/}*.css'],
+            options: {
+                dirs: [config.dir.build]
             }
         },
 
@@ -233,10 +199,6 @@ module.exports = function(grunt) {
             'cssmin',
             'htmlmin'
         ]);
-
-        if(this.components.indexOf('requirejs') !== -1) {
-            grunt.task.run(['bower', 'requirejs']);
-        }
     });
 };
 

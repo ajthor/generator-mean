@@ -23,7 +23,7 @@ var Generator = module.exports = function Generator() {
 	}
 	// Set these values as attributes of generators. 
 	// These will be available to all generators that inherit this one.
-	this.components = this.config.get('components');
+	// this.components = this.config.get('components');
 	this.directories = this.config.get('directories');
 	this.devDirectories = this.config.get('devDirectories');
 	
@@ -137,11 +137,7 @@ Generator.prototype.writeSpec = function writeSpec(path, module) {
 	if(!path || !module) throw "Must supply non-falsey values to \'writeSpec\'!";
 	var template;
 	
-	if(this.components.indexOf('requirejs') !== -1) {
-		template = this.getTemplate('spec/require-spec.js');
-	} else {
-		template = this.getTemplate('spec/spec.js');
-	}
+	template = this.getTemplate('spec/spec.js');
 
 	var output = this.parseTemplate(template, module);
 
@@ -155,17 +151,7 @@ Generator.prototype.writeModule = function writeModule(path, module, template) {
 
 	this.validateModule(module);
 
-	var output = this.parseTemplate(template, module, function (output, data) {
-		if(this.components.indexOf('requirejs') == -1) return output;
-
-		var input = data;
-		input.module = output;
-
-		var requirejsTemplate = this.getTemplate('javascript/require.js');
-
-		return _.template(requirejsTemplate, input);
-
-	}.bind(this));
+	var output = this.parseTemplate(template, module);
 
 	this.write(path + '.js', output);
 };
@@ -270,13 +256,9 @@ Generator.prototype.wireScriptsToFile = function wireScriptsToFile(file, scripts
 	// Load file into object for dom manipulation.
 	var $file = cheerio.load(file);
 
-	if(this.components.indexOf('requirejs') !== -1) {
-		$file('body').append("<script data-main=\"" + path.join(this.devDirectories.relScripts, 'main') + '" src="' + path.join(this.devDirectories.relVendor, 'requirejs/require.js') + "\"></script>");
-	} else {
-		_.each(scripts, function (script) {
-			$file('body').append("<script src=\"" + script + "\"></script>");
-		}, this);
-	}
+	_.each(scripts, function (script) {
+		$file('body').append("<script src=\"" + script + "\"></script>");
+	}, this);
 
 	$file('body').attr('ng-app', 'app');
 

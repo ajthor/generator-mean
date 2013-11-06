@@ -34,9 +34,9 @@ Generator.prototype.setBowerFiles = function setBowerFiles() {
   this.pushToConfig("scripts", "jquery", path.join(this.directories.vendor, "/jquery/jquery.js"));
   this.pushToConfig("scripts", "angular", path.join(this.directories.vendor, "/angular/angular.js"));
 
-  _.each(this.components, function (component) {
-    bowerConfig.dependencies[component] = "*";
-  });
+  // _.each(this.components, function (component) {
+  //   bowerConfig.dependencies[component] = "*";
+  // });
 
   this.setConfigFile('.bowerrc', {
     directory: this.directories.vendor
@@ -63,19 +63,16 @@ Generator.prototype.setPackageFiles = function setPackageFiles() {
     "grunt-karma": "*",
     "karma": "*",
     "karma-jasmine": "*",
-    "karma-requirejs": "*",
     "time-grunt": "*",
     "load-grunt-tasks": "*",
     "grunt-contrib-watch": "*",
     "grunt-contrib-clean": "*",
     "grunt-contrib-jshint": "*",
-    "grunt-contrib-requirejs": "*",
     "grunt-contrib-htmlmin": "*",
     "grunt-contrib-cssmin": "*",
     "grunt-autoprefixer": "*",
     "grunt-nodemon": "*",
-    "grunt-concurrent": "*",
-    "grunt-bower-requirejs": "*"
+    "grunt-concurrent": "*"
   };
 
   this.setConfigFile('package.json', packageConfig);
@@ -86,7 +83,7 @@ Generator.prototype.setGeneralConfig = function setGeneralConfig() {
     PORT: 3000,
     dir: this.directories,
     devDir: this.devDirectories,
-    components: this.components
+    // components: this.components
   }, "module");
 };
 
@@ -97,19 +94,6 @@ Generator.prototype.copyGruntfile = function copyGruntfile() {
 Generator.prototype.makeAppModule = function makeAppModule() {
   if(this.options['config-only']===true) return;
   this.buildModule('common/app.js', {name: 'app', specDependencies: ['app']});
-};
-
-Generator.prototype.makeMainModule = function makeMainModule() {
-  if(this.options['config-only']===true) return;
-  if(this.components.indexOf('requirejs') === -1) return;
-  var template = this.getTemplate('common/main.js');
-
-  this.mainModule = this.createModule({
-    name: 'main'
-  });
-  
-  var output = this.parseTemplate(template, this.mainModule);
-  this.write(this.mainModule.path + '.js', output);
 };
 
 Generator.prototype.writeIndexFile = function writeIndexFile() {
