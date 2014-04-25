@@ -80,7 +80,11 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.log(chalk.magenta('You\'re using the fantastic Mean generator.'));
 	},
 
-	public: function() {
+	directories: function() {
+		this.dest.mkdir('server');
+		this.dest.mkdir('server/controllers');
+		this.dest.mkdir('server/routes');
+		this.dest.mkdir('server/views');
 		this.dest.mkdir('public');
 		this.dest.mkdir('public/templates');
 	},

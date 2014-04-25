@@ -5,14 +5,22 @@ var yeoman = require('yeoman-generator');
 
 
 var BoilerplateGenerator = yeoman.generators.Base.extend({
-	init: function() {
+	init: function() {},
 
+	directories: function() {
+		this.dest.mkdir('server');
+		this.dest.mkdir('server/views');
+		this.dest.mkdir('public/scripts');
+		this.dest.mkdir('public/scripts/vendor');
+		this.dest.mkdir('public/css');
+		this.dest.mkdir('public/img');
 	},
 
 	h5bp: function() {
 		var done = this.async();
 		var ignores = [
 			'index.html',
+			'404.html',
 			'.DS_Store',
 			'.git',
 			'.gitignore',
@@ -25,10 +33,6 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 			'CONTRIBUTING.md',
 			'README.md'
 		];
-
-		this.dest.mkdir('public/scripts');
-		this.dest.mkdir('public/scripts/vendor');
-		this.dest.mkdir('public/img');
 
 		this.remote('h5bp', 'html5-boilerplate', 'master', function(err, remote) {
 			if (err) {
@@ -47,8 +51,17 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 				}
 			});
 
+			remote.copy('404.html', 'server/views/404.html');
+
 			done();
 		}.bind(this));
+
+	},
+
+	indexFile: function() {
+		var index = this.read("index.html");
+
+		this.write("server/views/index.html", index);
 	}
 });
 
