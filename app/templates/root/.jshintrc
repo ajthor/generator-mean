@@ -5,7 +5,7 @@
   "bitwise": true,
   "camelcase": true,
   "curly": true,
-  "eqeqeq": true,
+  "eqeqeq": false,
   "immed": true,
   "indent": 4,
   "latedef": true,
@@ -17,8 +17,24 @@
   "unused": true,
   "strict": true,
   "trailing": true,
-  "smarttabs": true,
+  "smarttabs": false,
+  "devel": false,
   "globals": {
     "angular": false
-  }
+  },
+  "predef": [
+    "define",
+    "require",
+    "exports",
+    "module",
+    "describe",
+    "before",
+    "beforeEach",
+    "after",
+    "afterEach",
+    "it",
+    "inject",
+    "expect",
+    "spyOn"
+  ]
 }
