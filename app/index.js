@@ -2,77 +2,63 @@
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
+var chalk = require('chalk');
 
-var GeneratorBase = require('../generator-base.js');
 
-var _ = require('lodash');
+var MeanGenerator = yeoman.generators.Base.extend({
+  init: function () {
+    this.pkg = require('../package.json');
 
-var Generator = module.exports = function Generator(args, options, config) {
-  GeneratorBase.apply(this, arguments);
+    // this.hookFor('mean:boilerplate');
 
-  this.hookFor('mean:boilerplate', {
-    args: args,
-    options: {
-      options: {
-        "dont-ask": this.options["dont-ask"] || true
+    this.on('end', function () {
+      if (!this.options['skip-install']) {
+        // this.installDependencies();
       }
-    }
-  });
+    });
+  },
 
-  this.hookFor('mean:common', {
-    args: args,
-    options: {
-      options: {
-        "config-only": false
-      }
-    }
-  });
+  askFor: function () {
+    // var done = this.async();
 
-  this.on('end', function () {
-    this.installDependencies({ skipInstall: options['skip-install'] });
-  });
+    // have Yeoman greet the user
+    this.log(this.yeoman);
 
-};
+    // replace it with a short and sweet description of your generator
+    this.log(chalk.magenta('You\'re using the fantastic Mean generator.'));
 
-util.inherits(Generator, GeneratorBase);
+    // var prompts = [{
+    //   type: 'confirm',
+    //   name: 'someOption',
+    //   message: 'Would you like to enable this option?',
+    //   default: true
+    // }];
 
-Generator.prototype.askFor = function askFor() {
-  // If the argument 'dont-ask' was set, return.
-  if(this.options["dont-ask"]===true) return;
+    // this.prompt(prompts, function (props) {
+    //   this.someOption = props.someOption;
 
-  // have Yeoman greet the user.
-  console.log(this.yeoman);
+    //   done();
+    // }.bind(this));
+  },
 
-  var done = this.async();
+  app: function () {
+    this.dest.mkdir('app');
+    this.dest.mkdir('app/templates');
+  },
 
-  // var prompts = [{
-  //   type: 'checkbox',
-  //   name: 'components',
-  //   message: "What else would you like?",
-  //   choices: [{
-  //     name: 'RequireJS Support',
-  //     value: 'requirejs',
-  //     checked: true
-  //   }]
-  // }];
+  projectFiles: function() {
+    this.copy('_package.json', 'package.json');
+    this.copy('_bower.json', 'bower.json');
 
-  // this.prompt(prompts, function (results) {
-  //   // Set components to an empty array.
-  //   this.components = [];
-  //   // Add components which the user selected.
-  //   _.each(results.components, function (component) {
-  //     this.components.push(component);
-  //   }, this);
-  //   // And send the components to the configuration file.
-  //   this.config.set("components", this.components);
-  //   this.config.forceSave();
+    this.copy('gitignore', '.gitignore');
+  },
 
-  //   // WARNING: Need this async 'done' call to ensure hooks work???
-  //   done();
-  // }.bind(this));
+  root: function() {
+    this.directory('./root', '.');
+  }
 
+});
 
-};
-
+module.exports = MeanGenerator;
 
 

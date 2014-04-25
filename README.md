@@ -1,71 +1,47 @@
-# MEAN Generator
-MEAN Generator is a Yeoman generator for scaffolding applications based on the MEAN stack. MEAN is a set of features which work well together in creating full-stack applications.
+# generator-mean [![Build Status](https://secure.travis-ci.org/ajthor/generator-mean.png?branch=master)](https://travis-ci.org/ajthor/generator-mean)
 
-List of generators:
+> [Yeoman](http://yeoman.io) generator
 
-- app (main)
-- boilerplate (hooked from app)
-- common (hooked from app)
-- AngularJS Generators
-    - controller
-    - decorator
-    - directive
-    - filter
-    - module
-    - provider
-    - route
-    - service
-    - view
 
-List of possible options to use:
-    --dont-ask : Don't show any dialogs for user interaction. If run on the main generator, it will default to no RequireJS support.
-    --skip-add : Don't add the script tag to the index.html file or scripts configuration. Just create the files.
-    --reset-scripts : Will reset all scripts in the index.html file and replace them with the current scripts configuration.
-    --remove : Used on AngularJS Generators to remove the script from the configuration.
+## Getting Started
 
-## app
-    yo mean
-Generator responsible for setting the configuration options for the project. Gets input from the user about what sort of features the user would like to include and adds them to the stack. Possible to include:
-    - RequireJS Support
+### What is Yeoman?
 
-*Hooks for: boilerplate, common*
+Trick question. It's not a thing. It's this guy:
 
-## boilerplate
-    yo mean:boilerplate
-Generator responsible for creating scaffolding for application, including directory structure and basic files. Call this generator standalone to specify custom directories for files.
+![](http://i.imgur.com/JHaAlBJ.png)
 
-### Default Directory Structure:
-    app
-    app/views
-    app/routes
-    app/controllers
-    app/models
-    public
-    public/img
-    public/css
-    public/js
-    public/js/vendor
-    public/views
-    config
-    test
-    test/specs
-    build
-    
-## common
-    yo mean:common
-Generator responsible for creating application specific files and config such as:
+Basically, he wears a top hat, lives in your computer, and waits for you to tell him what kind of application you wish to create.
 
-    bower.json
-    package.json
-    Gruntfile.js
-    app.js
-    main.js (RequireJS only)
-    index.html
-    
-## AngularJS Generators 
-    yo mean:module "name"
+Not every new computer comes with a Yeoman pre-installed. He lives in the [npm](https://npmjs.org) package repository. You only have to ask for him once, then he packs up and moves into your hard drive. *Make sure you clean up, he likes new and shiny things.*
 
-Optional argument: name
-If no name is specified, generator will default to using the component type (Controller, Filter, etc.)
+```
+$ npm install -g yo
+```
 
-Generator responsible for creating AngularJS modules which are created immediately, but also stored in a configuration file for later compilation. Currently has support for: modules, controllers, directives, filters, and services. Other generators are not yet fully supported and may not work.
+### Yeoman Generators
+
+Yeoman travels light. He didn't pack any generators when he moved in. You can think of a generator like a plug-in. You get to choose what type of application you wish to create, such as a Backbone application or even a Chrome extension.
+
+To install generator-mean from npm, run:
+
+```
+$ npm install -g generator-mean
+```
+
+Finally, initiate the generator:
+
+```
+$ yo mean
+```
+
+### Getting To Know Yeoman
+
+Yeoman has a heart of gold. He's a person with feelings and opinions, but he's very easy to work with. If you think he's too opinionated, he can be easily convinced.
+
+If you'd like to get to know Yeoman better and meet some of his friends, [Grunt](http://gruntjs.com) and [Bower](http://bower.io), check out the complete [Getting Started Guide](https://github.com/yeoman/yeoman/wiki/Getting-Started).
+
+
+## License
+
+MIT

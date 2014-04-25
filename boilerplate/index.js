@@ -3,100 +3,49 @@ var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
 
-var GeneratorBase = require('../generator-base.js');
 
-var _ = require('lodash');
+var BoilerplateGenerator = yeoman.generators.Base.extend({
+	init: function () {
+	},
 
-var Generator = module.exports = function Generator(args, options, config) {
-	GeneratorBase.apply(this, arguments);
+	h5bp: function () {
+		var done = this.async();
+		var ignores = [
+			'.git',
+			'CHANGELOG.md',
+			'CONTRIBUTING.md',
+			'README.md'
+		];
 
-};
+		this.destinationRoot("./app/");
 
-util.inherits(Generator, GeneratorBase);
+		this.dest.mkdir("js");
+		this.dest.mkdir("js/vendor");
+		this.dest.mkdir("img");
 
-Generator.prototype.setDirectories = function setDirectories() {
-	// Set default directory structure.
-	this.directories = {
-		app:            "app",
-		appviews:       "app/views",
-		approutes:      "app/routes",
-		appcontrollers: "app/controllers",
-		appmodels:      "app/models",
-		public:         "public",
-		images:         "public/img",
-		styles:         "public/css",
-		scripts:        "public/js",
-		vendor:         "public/js/vendor",
-		publicviews:    "public/views",
-		config:         "config",
-		test:           "test",
-		specs:          "test/specs",
-		build:          "build",
-	};
-	// Set 'development' directories.
-	this.devDirectories = {
-		templates:      path.join(this.sourceRoot(), '../../templates'),
-		relScripts:     "./js",
-		relVendor:      "./js/vendor"
-	};
-};
+		this.remote('h5bp', 'html5-boilerplate', 'master', function(err, remote) {
+			if (err) {
+				return done(err);
+			}
 
-Generator.prototype.askForDirectories = function askForDirectories() {
-	// If the argument 'dont-ask' was set, return.
-	if(this.options["dont-ask"]===true) return;
-	// Otherwise, set up to ask the user for some input.
-	var done = this.async();
-	var prompts = [];
-	// Give some instructions.
-	console.log(this.instructions(
-		"Setting directories manually. Be careful what directories you use. " +
-		"If you make a mistake, exit the generator using (Control+C) and retry. " +
-		"If you want to use the default directories, run: " + 
-		"[yo mean:boilerplate --dont-ask]"
-		));
-	// Populate the prompts array.
-	_.each(this.directories, function (dir, key) {
-		prompts.push({
-			type: 'input',
-			name: key,
-			message: key,
-			default: dir
-		});
-	}, this);
-	// Ask the user one by one and replace directories.
-	this.prompt(prompts, function (results) {
-		// Set to new directories.
-		this.directories = results;
+			remote.directory('css');
+			remote.directory('img');
+			remote.directory('js');
 
-		done();
-	}.bind(this));
-};
+			this.expandFiles('*', {
+				cwd: remote.src._base,
+				dot: true
+			}).forEach(function (el) {
+				if (ignores.indexOf(el) === -1) {
+					remote.copy(el, el);
+				}
+			});
 
-Generator.prototype.makeDirectories = function makeDirectories() {
-	// Cycle through object, creating directories as specified.
-	_.each(this.directories, function (dir) {
+			done();
+		}.bind(this));
+	}
+});
 
-		this.mkdir(dir);
+module.exports = BoilerplateGenerator;
 
-	}, this);
-};
-
-Generator.prototype.saveConfiguration = function saveConfiguration() {
-	this.config.set("directories", this.directories);
-	this.config.set("devDirectories", this.devDirectories);
-
-	this.config.forceSave();
-};
-
-Generator.prototype.copyBoilerplateFiles = function copyBoilerplateFiles() {
-	this.copy(path.join(this.devDirectories.templates, 'boilerplate/server.js'), 'server.js');
-	this.copy(path.join(this.devDirectories.templates, 'boilerplate/routes.js'), path.join(this.directories.app, 'routes.js'));
-	this.copy(path.join(this.devDirectories.templates, 'boilerplate/routes/index.js'), path.join(this.directories.approutes, 'index.js'));
-
-	this.copy(path.join(this.devDirectories.templates, 'boilerplate/public/robots.txt'), path.join(this.directories.public, 'robots.txt'));
-	this.copy(path.join(this.devDirectories.templates, 'boilerplate/public/humans.txt'), path.join(this.directories.public, 'humans.txt'));
-
-	this.copy(path.join(this.devDirectories.templates, 'boilerplate/public/css/main.css'), path.join(this.directories.styles, 'main.css'));
-	this.copy(path.join(this.devDirectories.templates, 'boilerplate/public/css/normalize.min.css'), path.join(this.directories.styles, 'normalize.min.css'));
-};
 
