@@ -2,60 +2,138 @@
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
+var wiredep = require('wiredep');
 var chalk = require('chalk');
 
 
 var MeanGenerator = yeoman.generators.Base.extend({
-  init: function () {
-    this.pkg = require('../package.json');
+	constructor: function(args, options) {
+		yeoman.generators.Base.apply(this, arguments);
 
-    // this.hookFor('mean:boilerplate');
+		this.argument('appname', { type: String, required: false });
+		this.appname = this.appname || path.basename(process.cwd());
+		this.appname = this._.camelize(this._.slugify(this._.humanize(this.appname)));
 
-    this.on('end', function () {
-      if (!this.options['skip-install']) {
-        // this.installDependencies();
-      }
-    });
-  },
+		if (typeof this.env.options.appPath === 'undefined') {
+			try {
+				this.env.options.appPath = require(path.join(process.cwd(), 'bower.json')).appPath;
+			} catch (e) {}
+				this.env.options.appPath = this.env.options.appPath || 'public';
+		}
 
-  askFor: function () {
-    // var done = this.async();
+		this.appPath = this.env.options.appPath;
 
-    // have Yeoman greet the user
-    this.log(this.yeoman);
 
-    // replace it with a short and sweet description of your generator
-    this.log(chalk.magenta('You\'re using the fantastic Mean generator.'));
 
-    // var prompts = [{
-    //   type: 'confirm',
-    //   name: 'someOption',
-    //   message: 'Would you like to enable this option?',
-    //   default: true
-    // }];
+		args = ['main'];
+		
+		this.hookFor('mean:boilerplate', {
+			args: args
+		});
 
-    // this.prompt(prompts, function (props) {
-    //   this.someOption = props.someOption;
+		this.hookFor('angular:main', {
+			args: args
+		});
 
-    //   done();
-    // }.bind(this));
-  },
+		this.hookFor('angular:controller', {
+			args: args
+		});
 
-  app: function () {
-    this.dest.mkdir('app');
-    this.dest.mkdir('app/templates');
-  },
+	},
 
-  projectFiles: function() {
-    this.copy('_package.json', 'package.json');
-    this.copy('_bower.json', 'bower.json');
+	init: function() {
+		this.pkg = require('../package.json');
 
-    this.copy('gitignore', '.gitignore');
-  },
+		// this.hookFor('mean:boilerplate');
 
-  root: function() {
-    this.directory('./root', '.');
-  }
+		this.on('end', function() {
+			this.installDependencies({
+				skipInstall: this.options['skip-install'],
+				callback: this._injectDependencies.bind(this)
+			});
+
+			this.invoke('karma:app', {
+				options: {
+					cwd: this.destinationRoot(),
+					coffee: this.options.coffee,
+					travis: false,
+					'skip-install': this.options['skip-install'],
+					components: [
+						'angular/angular.js',
+						'angular-mocks/angular-mocks.js',
+						'angular-resource/angular-resource.js',
+						'angular-cookies/angular-cookies.js',
+						'angular-sanitize/angular-sanitize.js',
+						'angular-route/angular-route.js'
+					]
+				}
+			});
+		});
+	},
+
+	askFor: function() {
+
+		// have Yeoman greet the user
+		this.log(this.yeoman);
+
+		// replace it with a short and sweet description of your generator
+		this.log(chalk.magenta('You\'re using the fantastic Mean generator.'));
+	},
+
+	public: function() {
+		this.dest.mkdir('public');
+		this.dest.mkdir('public/templates');
+	},
+
+	projectFiles: function() {
+		this.copy('_package.json', 'package.json');
+		this.copy('_bower.json', 'bower.json');
+
+		this.copy('gitignore', '.gitignore');
+	},
+
+	root: function() {
+		this.directory('./root', '.');
+	},
+
+	bootstrap: function() {
+		// var done = this.async();
+
+		// this.prompt({
+		// 	type: 'confirm',
+		// 	name: 'bootstrap',
+		// 	message: 'Would you like to install Twitter Bootstrap?',
+		// 	default: true
+		// }, function (props) {
+		// 	this.bootstrap = props.bootstrap;
+
+		// 	done();
+		// }.bind(this));
+
+
+		// if(this.bootstrap) {
+		// 	// Install bootstrap.
+		// }
+
+	},
+
+	_injectDependencies: function _injectDependencies() {
+		if (!this.options['skip-install']) {
+			wiredep({
+				directory: 'public/scripts/vendor',
+				bowerJson: JSON.parse(fs.readFileSync('./bower.json')),
+				ignorePath: 'public/',
+				src: 'public/index.html',
+				fileTypes: {
+					html: {
+						replace: {
+							css: '<link rel="stylesheet" href="{{filePath}}">'
+						}
+					}
+				}
+			});
+		}
+	}
 
 });
 

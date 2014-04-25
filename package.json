@@ -23,6 +23,7 @@
     "yeoman-generator"
   ],
   "dependencies": {
+    "wiredep": "~1.0.0",
     "yeoman-generator": "~0.16.0",
     "chalk": "~0.4.0"
   },
@@ -30,6 +31,8 @@
     "mocha": "*"
   },
   "peerDependencies": {
+    "generator-karma": ">=0.6.0",
+    "generator-angular": "latest",
     "yo": ">=1.0.0"
   }
 }
