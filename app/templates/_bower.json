@@ -5,6 +5,8 @@
 	"dependencies": {
 		"angular": "latest",
 		"es5-shim": "~2.1.0",
+		"less": "~1.7.0",
+		"font-awesome": "~4.0.3",
 		"angular-resource": "latest",
 		"angular-cookies": "latest",
 		"angular-sanitize": "latest",
@@ -14,8 +16,8 @@
 		"bootstrap": "~3.1.1"
 	},
 	"devDependencies": {
-		"angular-mocks": "1.2.15",
-		"angular-scenario": "1.2.15"
+		"angular-mocks": "latest",
+		"angular-scenario": "latest"
 	}
 }
 
