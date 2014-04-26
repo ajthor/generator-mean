@@ -18,9 +18,12 @@ var MeanGenerator = yeoman.generators.Base.extend({
 			try {
 				this.env.options.appPath = require(path.join(process.cwd(), 'bower.json')).appPath;
 			} catch (e) {}
-				this.env.options.appPath = this.env.options.appPath || 'public';
+			if(!this.env.options.appPath) {
+				this.env.options.appPath = this.options.appPath || 'public';
+			}
 		}
 
+		this.config.set('appPath', this.env.options.appPath);
 		this.appPath = this.env.options.appPath;
 
 
@@ -28,15 +31,30 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		args = ['main'];
 		
 		this.hookFor('mean:boilerplate', {
-			args: args
+			args: args,
+			options: {
+				options: {
+					'appPath': 'public'
+				}
+			}
 		});
 
 		this.hookFor('angular:main', {
-			args: args
+			args: args,
+			options: {
+				options: {
+					'appPath': 'public'
+				}
+			}
 		});
 
 		this.hookFor('angular:controller', {
-			args: args
+			args: args,
+			options: {
+				options: {
+					'appPath': 'public'
+				}
+			}
 		});
 
 	},
