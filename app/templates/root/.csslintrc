@@ -1,6 +1,10 @@
 {
-    "box-sizing"               : false,
-    "display-property-grouping": false,
-    "star-property-hack"       : false,
-    "unqualified-attributes"   : false
+	"empty-rules": true,
+	"vendor-prefix", true,
+	"compatible-vendor-prefixes": true,
+	"unique-headings": true,
+    "box-model": true,
+    "display-property-grouping": true,
+    "star-property-hack": false,
+    "unqualified-attributes": false
 }
