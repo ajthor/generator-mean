@@ -1,4 +1,5 @@
 'use strict';
+var fs = require('fs');
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
@@ -39,8 +40,9 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 				return done(err);
 			}
 
-			remote.directory('public/css');
-			remote.directory('public/img');
+			remote.directory('css', 'public/css');
+			remote.directory('img', 'public/img');
+			// remote.directory('js', 'public/scripts');
 
 			this.expandFiles('*', {
 				cwd: remote.src._base,
@@ -62,6 +64,10 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 		var index = this.read("index.html");
 
 		this.write("server/views/index.html", index);
+	},
+
+	gulpfile: function() {
+		this.copy("gulpfile.js");
 	}
 });
 
