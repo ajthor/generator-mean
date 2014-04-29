@@ -1,4 +1,5 @@
 'use strict';
+var fs = require('fs');
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
@@ -56,13 +57,20 @@ var MeanGenerator = yeoman.generators.Base.extend({
 				}
 			}
 		});
+		
+		this.hookFor('mean:server', {
+			args: args,
+			options: {
+				options: {
+					'appPath': 'public'
+				}
+			}
+		});
 
 	},
 
 	init: function() {
 		this.pkg = require('../package.json');
-
-		// this.hookFor('mean:boilerplate');
 
 		this.on('end', function() {
 			this.installDependencies({
@@ -89,13 +97,21 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		});
 	},
 
-	askFor: function() {
-
+	welcome: function() {
 		// have Yeoman greet the user
 		this.log(this.yeoman);
 
-		// replace it with a short and sweet description of your generator
-		this.log(chalk.magenta('You\'re using the fantastic Mean generator.'));
+		this.log(chalk.red('---- MEAN GENERATOR ----'));
+		this.log(chalk.yellow(
+			'The MEAN generator is modular, and made to be used with\n',
+			'other existing Yeoman generators. Either run the base\n',
+			'MEAN generator, or call each generator independently.\n'
+			));
+
+		this.log(chalk.yellow('Generators included:'));
+		this.log(chalk.green('- app'));
+		this.log(chalk.green('- boilerplate'));
+		this.log(chalk.green('- server'));
 	},
 
 	directories: function() {
@@ -114,8 +130,19 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.copy('gitignore', '.gitignore');
 	},
 
-	root: function() {
-		this.directory('./root', '.');
+	rootFiles: function() {
+		var ignores = [
+			'.DS_Store'
+		];
+
+		this.expandFiles('*', {
+			cwd: path.join(this.src._base, '/root'),
+			dot: true
+		}).forEach(function(file) {
+			if( ignores.indexOf(file) === -1 ) {
+				this.copy(path.join(this.src._base, '/root', file), file);
+			}
+		}.bind(this));
 	},
 
 	bootstrap: function() {
