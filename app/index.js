@@ -11,6 +11,9 @@ var MeanGenerator = yeoman.generators.Base.extend({
 	constructor: function(args, options) {
 		yeoman.generators.Base.apply(this, arguments);
 
+		
+		this.pkg = require('../package.json');
+
 		this.argument('appname', { type: String, required: false });
 		this.argument('no-hooks', { type: Boolean, required: false });
 		this.appname = this.appname || path.basename(process.cwd());
@@ -69,11 +72,6 @@ var MeanGenerator = yeoman.generators.Base.extend({
 				}
 			});
 		}
-
-	},
-
-	init: function() {
-		this.pkg = require('../package.json');
 
 		this.on('end', function() {
 			if (!this.options['skip-install']) {
