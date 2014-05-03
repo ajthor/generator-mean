@@ -12,6 +12,7 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		yeoman.generators.Base.apply(this, arguments);
 
 		this.argument('appname', { type: String, required: false });
+		this.argument('no-hooks', { type: Boolean, required: false });
 		this.appname = this.appname || path.basename(process.cwd());
 		this.appname = this._.camelize(this._.slugify(this._.humanize(this.appname)));
 
@@ -31,41 +32,43 @@ var MeanGenerator = yeoman.generators.Base.extend({
 
 		args = ['main'];
 		
-		this.hookFor('mean:boilerplate', {
-			args: args,
-			options: {
+		if(!this.arguments['no-hooks']) {
+			this.hookFor('mean:boilerplate', {
+				args: args,
 				options: {
-					'appPath': 'public'
+					options: {
+						'appPath': 'public'
+					}
 				}
-			}
-		});
+			});
 
-		this.hookFor('angular:main', {
-			args: args,
-			options: {
+			this.hookFor('angular:main', {
+				args: args,
 				options: {
-					'appPath': 'public'
+					options: {
+						'appPath': 'public'
+					}
 				}
-			}
-		});
+			});
 
-		this.hookFor('angular:controller', {
-			args: args,
-			options: {
+			this.hookFor('angular:controller', {
+				args: args,
 				options: {
-					'appPath': 'public'
+					options: {
+						'appPath': 'public'
+					}
 				}
-			}
-		});
-		
-		this.hookFor('mean:server', {
-			args: args,
-			options: {
+			});
+			
+			this.hookFor('mean:server', {
+				args: args,
 				options: {
-					'appPath': 'public'
+					options: {
+						'appPath': 'public'
+					}
 				}
-			}
-		});
+			});
+		}
 
 	},
 
@@ -73,10 +76,18 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.pkg = require('../package.json');
 
 		this.on('end', function() {
-			this.installDependencies({
-				skipInstall: this.options['skip-install'],
-				callback: this._injectDependencies.bind(this)
-			});
+			if (!this.options['skip-install']) {
+				this.installDependencies({
+					callback: function() {
+						this._injectDependencies.bind(this);
+
+						if(!this.options['no-git']) {
+							this.spawnCommand('grunt', ['init']);
+
+						}
+					}
+				});
+			}
 
 			this.invoke('karma:app', {
 				options: {
@@ -107,7 +118,7 @@ var MeanGenerator = yeoman.generators.Base.extend({
 			'other existing Yeoman generators*. Either run the base\n',
 			'MEAN generator, or call each generator independently.\n\n',
 			'*Compatibility with angular and backbone generators\n',
-			'using the \'appPath\' option.\n'
+			'using the \'--appPath=\"public\"\' option.\n'
 			));
 
 		this.log(chalk.yellow('Generators included:'));

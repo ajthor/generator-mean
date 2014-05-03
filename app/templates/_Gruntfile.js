@@ -13,7 +13,8 @@ module.exports = function(grunt) {
 				command: [
 					'git init',
 					'git add .',
-					'git commit -a -m \"initial commit\"'
+					'git commit -a -m \"initial commit\"',
+					'git checkout -b development'
 				].join('&&')
 			}
 		}
