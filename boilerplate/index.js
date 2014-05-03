@@ -9,8 +9,8 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 	init: function() {},
 
 	directories: function() {
-		this.dest.mkdir('server');
-		this.dest.mkdir('server/views');
+		this.dest.mkdir('routes');
+		this.dest.mkdir('views');
 		this.dest.mkdir('public/scripts');
 		this.dest.mkdir('public/scripts/vendor');
 		this.dest.mkdir('public/css');
@@ -53,7 +53,7 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 				}
 			});
 
-			remote.copy('404.html', 'server/views/404.html');
+			remote.copy('404.html', 'views/404.html');
 
 			done();
 		}.bind(this));
@@ -63,11 +63,7 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 	indexFile: function() {
 		var index = this.read("index.html");
 
-		this.write("server/views/index.html", index);
-	},
-
-	gulpfile: function() {
-		this.copy("gulpfile.js");
+		this.write("views/index.html", index);
 	}
 });
 

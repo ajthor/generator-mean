@@ -104,8 +104,10 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.log(chalk.red('---- MEAN GENERATOR ----'));
 		this.log(chalk.yellow(
 			'The MEAN generator is modular, and made to be used with\n',
-			'other existing Yeoman generators. Either run the base\n',
-			'MEAN generator, or call each generator independently.\n'
+			'other existing Yeoman generators*. Either run the base\n',
+			'MEAN generator, or call each generator independently.\n\n',
+			'*Compatibility with angular and backbone generators\n',
+			'using the \'appPath\' option.\n'
 			));
 
 		this.log(chalk.yellow('Generators included:'));
@@ -115,10 +117,8 @@ var MeanGenerator = yeoman.generators.Base.extend({
 	},
 
 	directories: function() {
-		this.dest.mkdir('server');
-		this.dest.mkdir('server/controllers');
-		this.dest.mkdir('server/routes');
-		this.dest.mkdir('server/views');
+		this.dest.mkdir('routes');
+		this.dest.mkdir('views');
 		this.dest.mkdir('public');
 		this.dest.mkdir('public/templates');
 	},
@@ -127,9 +127,10 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.copy('_package.json', 'package.json');
 		this.copy('_bower.json', 'bower.json');
 
-		this.copy('gitignore', '.gitignore');
+		this.copy("_Gruntfile.js");
+		this.copy("_gulpfile.js");
 	},
-
+	
 	rootFiles: function() {
 		var ignores = [
 			'.DS_Store'
@@ -143,27 +144,6 @@ var MeanGenerator = yeoman.generators.Base.extend({
 				this.copy(path.join(this.src._base, '/root', file), file);
 			}
 		}.bind(this));
-	},
-
-	bootstrap: function() {
-		// var done = this.async();
-
-		// this.prompt({
-		// 	type: 'confirm',
-		// 	name: 'bootstrap',
-		// 	message: 'Would you like to install Twitter Bootstrap?',
-		// 	default: true
-		// }, function (props) {
-		// 	this.bootstrap = props.bootstrap;
-
-		// 	done();
-		// }.bind(this));
-
-
-		// if(this.bootstrap) {
-		// 	// Install bootstrap.
-		// }
-
 	},
 
 	_injectDependencies: function _injectDependencies() {
