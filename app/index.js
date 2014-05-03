@@ -11,7 +11,7 @@ var MeanGenerator = yeoman.generators.Base.extend({
 	constructor: function(args, options) {
 		yeoman.generators.Base.apply(this, arguments);
 
-		
+
 		this.pkg = require('../package.json');
 
 		this.argument('appname', { type: String, required: false });
@@ -74,19 +74,6 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		}
 
 		this.on('end', function() {
-			if (!this.options['skip-install']) {
-				this.installDependencies({
-					callback: function() {
-						this._injectDependencies.bind(this);
-
-						if(!this.options['no-git']) {
-							this.spawnCommand('grunt', ['init']);
-
-						}
-					}
-				});
-			}
-
 			this.invoke('karma:app', {
 				options: {
 					cwd: this.destinationRoot(),
@@ -103,6 +90,19 @@ var MeanGenerator = yeoman.generators.Base.extend({
 					]
 				}
 			});
+
+			if (!this.options['skip-install']) {
+				this.installDependencies({
+					callback: function() {
+						this._injectDependencies.bind(this);
+
+						if(!this.options['no-git']) {
+							this.spawnCommand('grunt', ['init']);
+
+						}
+					}.bind(this)
+				});
+			}
 		});
 	},
 
