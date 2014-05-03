@@ -127,6 +127,35 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.log(chalk.green('- server'));
 	},
 
+	askFor: function() {
+		var done = this.async();
+
+		var prompts = [{
+			name: 'githubUser',
+			message: 'What is your GitHub user name?'
+		}, {
+			name: 'name',
+			message: 'What is the name of your project?',
+			default: path.basename(process.cwd())
+		}, {
+			name: 'description',
+			message: 'Description'
+		}];
+
+		this.prompt(prompts, function(props) {
+			this.githubUser = props.githubUser;
+
+			this.name = this._.slugify(props.name);
+			this.description = props.description;
+			
+			this.repoUrl = 'https://github.com/' + props.githubUser + '/' + this.name + '.git';
+			this.repoLink = 'git@github.com:' + props.githubUser + '/' + this.name + '.git';
+
+			done();
+		}.bind(this));
+
+	},
+
 	directories: function() {
 		this.dest.mkdir('routes');
 		this.dest.mkdir('views');
