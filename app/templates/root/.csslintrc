@@ -1,10 +1,10 @@
 {
 	"empty-rules": true,
-	"vendor-prefix", true,
+	"vendor-prefix": true,
 	"compatible-vendor-prefixes": true,
 	"unique-headings": true,
-    "box-model": true,
-    "display-property-grouping": true,
-    "star-property-hack": false,
-    "unqualified-attributes": false
+	"box-model": true,
+	"display-property-grouping": true,
+	"star-property-hack": false,
+	"unqualified-attributes": false
 }
