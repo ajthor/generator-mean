@@ -73,6 +73,8 @@ var MeanGenerator = yeoman.generators.Base.extend({
 			});
 		}
 
+
+
 		this.on('end', function() {
 			this.invoke('karma:app', {
 				options: {
@@ -97,13 +99,14 @@ var MeanGenerator = yeoman.generators.Base.extend({
 						this._injectDependencies.bind(this);
 
 						if(!this.options['no-git']) {
-							this.spawnCommand('grunt', ['init']);
+							this.spawnCommand('grunt', ['git-init']);
 
 						}
 					}.bind(this)
 				});
 			}
 		});
+
 	},
 
 	welcome: function() {
@@ -122,35 +125,41 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.log(chalk.yellow('Generators included:'));
 		this.log(chalk.green('- app'));
 		this.log(chalk.green('- boilerplate'));
-		this.log(chalk.green('- server'));
+		this.log(chalk.green('- server\n\n'));
 	},
 
 	askFor: function() {
-		var done = this.async();
+		// var done = this.async();
 
-		var prompts = [{
-			name: 'githubUser',
-			message: 'What is your GitHub user name?'
-		}, {
-			name: 'name',
-			message: 'What is the name of your project?',
-			default: path.basename(process.cwd())
-		}, {
-			name: 'description',
-			message: 'Description'
-		}];
+		// var prompts = [{
+		// 	name: 'githubUser',
+		// 	message: 'What is your GitHub user name?'
+		// }, {
+		// 	name: 'name',
+		// 	message: 'What is the name of your project?',
+		// 	default: path.basename(process.cwd())
+		// }, {
+		// 	name: 'description',
+		// 	message: 'Description'
+		// }];
 
-		this.prompt(prompts, function(props) {
-			this.githubUser = props.githubUser;
+		// this.prompt(prompts, function(props) {
+		// 	this.githubUser = props.githubUser;
 
-			this.name = this._.slugify(props.name);
-			this.description = props.description;
+		// 	this.name = this._.slugify(props.name);
+		// 	this.description = props.description;
 			
-			this.repoUrl = 'https://github.com/' + props.githubUser + '/' + this.name + '.git';
-			this.repoLink = 'git@github.com:' + props.githubUser + '/' + this.name + '.git';
+		// 	this.repoUrl = 'https://github.com/' + props.githubUser + '/' + this.name + '.git';
+		// 	this.repoLink = 'git@github.com:' + props.githubUser + '/' + this.name + '.git';
 
-			done();
-		}.bind(this));
+		// 	done();
+		// }.bind(this));
+
+		this.githubUser = 'ajthor';
+		this.name = 'mean-test';
+		this.description = '';
+		this.repoUrl = 'https://github.com/' + this.githubUser + '/' + this.name + '.git';
+		this.repoLink = 'git@github.com:' + this.githubUser + '/' + this.name + '.git';
 
 	},
 
@@ -162,11 +171,11 @@ var MeanGenerator = yeoman.generators.Base.extend({
 	},
 
 	projectFiles: function() {
-		this.copy('_package.json', 'package.json');
-		this.copy('_bower.json', 'bower.json');
+		this.template('_package.json', 'package.json');
+		this.template('_bower.json', 'bower.json');
 
-		this.copy("_Gruntfile.js");
-		this.copy("_gulpfile.js");
+		this.template("_Gruntfile.js", "Gruntfile.js");
+		this.template("_gulpfile.js", "gulpfile.js");
 	},
 	
 	rootFiles: function() {
