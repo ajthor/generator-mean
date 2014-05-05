@@ -180,10 +180,6 @@ var MeanGenerator = yeoman.generators.Base.extend({
 	},
 	
 	rootFiles: function() {
-		var ignores = [
-			'.DS_Store'
-		];
-
 		this.expandFiles('*', {
 			cwd: path.join(this.src._base, '/root'),
 			dot: true
