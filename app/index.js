@@ -120,11 +120,8 @@ var MeanGenerator = yeoman.generators.Base.extend({
 
 		this.log(chalk.red('---- MEAN GENERATOR ----'));
 		this.log(
-			'The MEAN generator is modular, and made to be used with \
-			other existing Yeoman generators*. Either run the base \
-			MEAN generator, or call each generator independently.\n\n',
-			'*Compatibility with angular and backbone generators \
-			using the \'--appPath=\"public\"\' option.\n'
+			'The MEAN generator is modular, and made to be used with other existing Yeoman generators*. Either run the base MEAN generator, or call each generator independently.\n\n',
+			'*Compatibility with angular and backbone generators using the \'', chalk.red('--appPath=\"public\"'), '\' option.\n'
 			);
 
 		this.log('Generators included:');
