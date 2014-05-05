@@ -6,11 +6,15 @@ var yeoman = require('yeoman-generator');
 
 
 var BoilerplateGenerator = yeoman.generators.Base.extend({
-	init: function() {},
+	init: function() {
+		this.on('end', function() {
+			this.spawnCommand('gulp', ['wire-dependencies']);
+		});
+	},
 
 	directories: function() {
-		this.dest.mkdir('routes');
-		this.dest.mkdir('views');
+		this.dest.mkdir('server/routes');
+		this.dest.mkdir('server/views');
 		this.dest.mkdir('public/scripts');
 		this.dest.mkdir('public/scripts/vendor');
 		this.dest.mkdir('public/css');
@@ -28,7 +32,6 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 			'.gitattributes',
 			'tile.png',
 			'tile-wide.png',
-			'apple-touch-icon-precomposed.png',
 			'browserconfig.xml',
 			'CHANGELOG.md',
 			'CONTRIBUTING.md',
@@ -53,7 +56,7 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 				}
 			});
 
-			remote.copy('404.html', 'views/404.html');
+			remote.copy('404.html', 'server/views/404.html');
 
 			done();
 		}.bind(this));
@@ -63,7 +66,7 @@ var BoilerplateGenerator = yeoman.generators.Base.extend({
 	indexFile: function() {
 		var index = this.read("index.html");
 
-		this.write("views/index.html", index);
+		this.write("server/views/index.html", index);
 	}
 });
 

@@ -9,6 +9,13 @@ module.exports = function(grunt) {
 				stderr: true
 			},
 
+// Git-Init Task
+// -------------
+// Sets up the project as a local Git repo, makes an initial commit 
+// to 'master', and creates a 'development' branch.
+// 
+// \* Called automatically from the Yeoman generator unless the 
+// `--no-git` flag is used.
 			'git-init': {
 				command: [
 					'git init',

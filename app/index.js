@@ -19,6 +19,13 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.appname = this.appname || path.basename(process.cwd());
 		this.appname = this._.camelize(this._.slugify(this._.humanize(this.appname)));
 
+		// __NOTE:__ This implementation of the `appPath` 
+		// configuration is something that is not standard for the 
+		// Angular.js and Backbone.js Yeoman Generators. In order for 
+		// the generators to be able to interface with this 
+		// generator, we need to do a little bit of trickery with the 
+		// `.yo-rc.json` file and the `bower.json` config file.
+
 		if (typeof this.env.options.appPath === 'undefined') {
 			try {
 				this.env.options.appPath = require(path.join(process.cwd(), 'bower.json')).appPath;
@@ -96,11 +103,8 @@ var MeanGenerator = yeoman.generators.Base.extend({
 			if (!this.options['skip-install']) {
 				this.installDependencies({
 					callback: function() {
-						this._injectDependencies.bind(this);
-
 						if(!this.options['no-git']) {
 							this.spawnCommand('grunt', ['git-init']);
-
 						}
 					}.bind(this)
 				});
@@ -114,15 +118,15 @@ var MeanGenerator = yeoman.generators.Base.extend({
 		this.log(this.yeoman);
 
 		this.log(chalk.red('---- MEAN GENERATOR ----'));
-		this.log(chalk.yellow(
+		this.log(
 			'The MEAN generator is modular, and made to be used with\n',
 			'other existing Yeoman generators*. Either run the base\n',
 			'MEAN generator, or call each generator independently.\n\n',
 			'*Compatibility with angular and backbone generators\n',
 			'using the \'--appPath=\"public\"\' option.\n'
-			));
+			);
 
-		this.log(chalk.yellow('Generators included:'));
+		this.log('Generators included:');
 		this.log(chalk.green('- app'));
 		this.log(chalk.green('- boilerplate'));
 		this.log(chalk.green('- server\n\n'));
@@ -164,10 +168,7 @@ var MeanGenerator = yeoman.generators.Base.extend({
 	},
 
 	directories: function() {
-		this.dest.mkdir('routes');
-		this.dest.mkdir('views');
 		this.dest.mkdir('public');
-		this.dest.mkdir('public/templates');
 	},
 
 	projectFiles: function() {
@@ -191,24 +192,6 @@ var MeanGenerator = yeoman.generators.Base.extend({
 				this.copy(path.join(this.src._base, '/root', file), file);
 			}
 		}.bind(this));
-	},
-
-	_injectDependencies: function _injectDependencies() {
-		if (!this.options['skip-install']) {
-			wiredep({
-				directory: 'public/scripts/vendor',
-				bowerJson: JSON.parse(fs.readFileSync('./bower.json')),
-				ignorePath: 'public/',
-				src: 'public/index.html',
-				fileTypes: {
-					html: {
-						replace: {
-							css: '<link rel="stylesheet" href="{{filePath}}">'
-						}
-					}
-				}
-			});
-		}
 	}
 
 });
