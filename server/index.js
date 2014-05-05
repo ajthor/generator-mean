@@ -9,8 +9,11 @@ var ServerGenerator = yeoman.generators.Base.extend({
 	init: function () {},
 
 	directories: function() {
-		this.dest.mkdir('routes');
-		this.dest.mkdir('views');
+		this.dest.mkdir('server');
+		this.dest.mkdir('server/config');
+		this.dest.mkdir('server/controllers');
+		this.dest.mkdir('server/routes');
+		this.dest.mkdir('server/views');
 	},
 
 	serverFiles: function() {
