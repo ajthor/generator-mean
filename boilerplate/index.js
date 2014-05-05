@@ -6,14 +6,9 @@ var yeoman = require('yeoman-generator');
 
 
 var BoilerplateGenerator = yeoman.generators.Base.extend({
-	init: function() {
-		this.on('end', function() {
-			this.spawnCommand('gulp', ['wire-dependencies']);
-		});
-	},
+	init: function() {},
 
 	directories: function() {
-		this.dest.mkdir('server/routes');
 		this.dest.mkdir('server/views');
 		this.dest.mkdir('public/scripts');
 		this.dest.mkdir('public/scripts/vendor');

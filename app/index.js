@@ -3,9 +3,7 @@ var fs = require('fs');
 var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
-var wiredep = require('wiredep');
 var chalk = require('chalk');
-
 
 var MeanGenerator = yeoman.generators.Base.extend({
 	constructor: function(args, options) {
@@ -103,6 +101,9 @@ var MeanGenerator = yeoman.generators.Base.extend({
 			if (!this.options['skip-install']) {
 				this.installDependencies({
 					callback: function() {
+						
+						this.spawnCommand('gulp', ['wire-dependencies']);
+
 						if(!this.options['no-git']) {
 							this.spawnCommand('grunt', ['git-init']);
 						}
@@ -184,9 +185,7 @@ var MeanGenerator = yeoman.generators.Base.extend({
 			cwd: path.join(this.src._base, '/root'),
 			dot: true
 		}).forEach(function(file) {
-			if( ignores.indexOf(file) === -1 ) {
-				this.copy(path.join(this.src._base, '/root', file), file);
-			}
+			this.copy(path.join(this.src._base, '/root', file), file);
 		}.bind(this));
 	}
 
