@@ -120,17 +120,17 @@ var MeanGenerator = yeoman.generators.Base.extend({
 
 		this.log(chalk.red('---- MEAN GENERATOR ----'));
 		this.log(
-			'The MEAN generator is modular, and made to be used with\n',
-			'other existing Yeoman generators*. Either run the base\n',
-			'MEAN generator, or call each generator independently.\n\n',
-			'*Compatibility with angular and backbone generators\n',
-			'using the \'--appPath=\"public\"\' option.\n'
+			'The MEAN generator is modular, and made to be used with \
+			other existing Yeoman generators*. Either run the base \
+			MEAN generator, or call each generator independently.\n\n',
+			'*Compatibility with angular and backbone generators \
+			using the \'--appPath=\"public\"\' option.\n'
 			);
 
 		this.log('Generators included:');
-		this.log(chalk.green('- app'));
-		this.log(chalk.green('- boilerplate'));
-		this.log(chalk.green('- server\n\n'));
+		this.log(chalk.green('- app'), chalk.grey(': copies hidden/dot files, git, npm, and bower files to project directory'));
+		this.log(chalk.green('- boilerplate'), chalk.grey(': fetches HTML5 Boilerplate and copies some common files'));
+		this.log(chalk.green('- server'), chalk.grey(': sets up Express server with MongoDB support'), '\n\n');
 	},
 
 	askFor: function() {
