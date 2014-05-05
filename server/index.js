@@ -18,6 +18,8 @@ var ServerGenerator = yeoman.generators.Base.extend({
 
 	serverFiles: function() {
 		var done = this.async();
+
+		this.copy('server.js');
 		
 		this.remote('linnovate', 'mean', 'master', function(err, remote) {
 			if (err) {
@@ -30,6 +32,10 @@ var ServerGenerator = yeoman.generators.Base.extend({
 
 			done();
 		});
+	},
+
+	configFiles: function() {
+		this.directory('config', 'server/config/');
 	}
 });
 
