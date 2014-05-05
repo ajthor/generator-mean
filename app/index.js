@@ -170,6 +170,8 @@ var MeanGenerator = yeoman.generators.Base.extend({
 
 	directories: function() {
 		this.dest.mkdir('public');
+		this.dest.mkdir('public/scripts');
+		this.dest.mkdir('public/scripts/vendor');
 	},
 
 	projectFiles: function() {
