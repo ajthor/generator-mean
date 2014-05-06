@@ -1,6 +1,13 @@
 {
-	"name": "package",
+	"name": "<%= name %>",
 	"version": "0.0.0",
+	"main": "server.js",
+	"description": "<%= description %>",
+	"repository": {
+		"type": "git",
+		"url": "<%= repoUrl %>"
+	},
+	"license": "MIT",
 	"dependencies": {
 		"bower": "^1.2.8",
 		"connect-mongo": "^0.4.0",
@@ -27,5 +34,8 @@
 		"gulp-ngmin": "^0.2.0",
 		"gulp-traceur": "^0.4.0",
 		"wiredep": "^1.4.4"
+	},
+	"scripts": {
+		"test": "gulp test"
 	}
 }
