@@ -1,6 +1,13 @@
 {
-	"name": "package",
+	"name": "<%= name %>",
 	"version": "0.0.0",
+	"main": "server.js",
+	"description": "<%= description %>",
+	"repository": {
+		"type": "git",
+		"url": "<%= repoUrl %>"
+	},
+	"license": "MIT",
 	"dependencies": {
 		"bower": "^1.2.8",
 		"connect-mongo": "^0.4.0",
@@ -17,6 +24,8 @@
 		"passport-twitter": "^1.0.2"
 	},
 	"devDependencies": {
+		"grunt": "^0.4.4",
+		"grunt-shell": "^0.7.0",
 		"gulp": "^3.6.2",
 		"gulp-browserify": "^0.5.0",
 		"gulp-closure-compiler": "^0.2.1",
@@ -25,5 +34,8 @@
 		"gulp-ngmin": "^0.2.0",
 		"gulp-traceur": "^0.4.0",
 		"wiredep": "^1.4.4"
+	},
+	"scripts": {
+		"test": "gulp test"
 	}
 }

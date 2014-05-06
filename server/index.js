@@ -10,6 +10,7 @@ var ServerGenerator = yeoman.generators.Base.extend({
 
 	directories: function() {
 		this.dest.mkdir('server');
+		this.dest.mkdir('server/config');
 		this.dest.mkdir('server/controllers');
 		this.dest.mkdir('server/routes');
 		this.dest.mkdir('server/views');
@@ -17,6 +18,8 @@ var ServerGenerator = yeoman.generators.Base.extend({
 
 	serverFiles: function() {
 		var done = this.async();
+
+		this.copy('server.js');
 		
 		this.remote('linnovate', 'mean', 'master', function(err, remote) {
 			if (err) {
@@ -29,6 +32,10 @@ var ServerGenerator = yeoman.generators.Base.extend({
 
 			done();
 		});
+	},
+
+	configFiles: function() {
+		this.directory('config', 'server/config/');
 	}
 });
 

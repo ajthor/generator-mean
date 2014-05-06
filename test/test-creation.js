@@ -1,6 +1,7 @@
 /*global describe, beforeEach, it */
 'use strict';
 var path = require('path');
+var generators = require('yeoman-generator');
 var helpers = require('yeoman-generator').test;
 
 describe('mean generator', function () {
