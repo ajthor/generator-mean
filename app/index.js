@@ -166,6 +166,8 @@ var MeanGenerator = yeoman.generators.Base.extend({
 	},
 
 	directories: function() {
+		this.dest.mkdir('server');
+		this.dest.mkdir('server/views');
 		this.dest.mkdir('public');
 		this.dest.mkdir('public/scripts');
 		this.dest.mkdir('public/scripts/vendor');
@@ -177,6 +179,8 @@ var MeanGenerator = yeoman.generators.Base.extend({
 
 		this.template("_Gruntfile.js", "Gruntfile.js");
 		this.template("_gulpfile.js", "gulpfile.js");
+
+		this.template("index.html", "server/views/index.html");
 	},
 	
 	rootFiles: function() {
@@ -184,7 +188,7 @@ var MeanGenerator = yeoman.generators.Base.extend({
 			cwd: path.join(this.src._base, '/root'),
 			dot: true
 		}).forEach(function(file) {
-			this.copy(path.join(this.src._base, '/root', file), file);
+			this.template(path.join(this.src._base, '/root', file), file);
 		}.bind(this));
 	}
 
